@@ -1,0 +1,23 @@
+//
+// The RXScript author
+// WaitGroup class, defines the goroutine batch operation.
+
+class WaitGroup {
+  private wg = null
+
+  public WaitGroup() {
+    this.wg = wait()
+  }
+
+  public add(delta) {
+    waitAdd(this.wg, delta)
+  }
+
+  public done() {
+    waitDone(this.wg)
+  }
+
+  public wait() {
+    waitOk(this.wg)
+  }
+}

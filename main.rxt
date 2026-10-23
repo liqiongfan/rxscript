@@ -1,0 +1,37 @@
+//
+// The RXScript author
+//
+
+import std as std
+
+main() {
+  wg = std.WaitGroup()
+
+  wg.add(1)
+
+  go {
+    defer { wg.done() }
+    num = 0
+    for {
+      if num >= 10 {
+        break
+      }
+      num++
+      println("goroutine 1")
+      sleep(500.0)
+    }
+  }
+
+  wg.add(1)
+  go {
+    defer { wg.done() }
+
+    for ik, v = range series(10, 0, -1) {
+      println(ik, v)
+      sleep(500.0)
+    }
+  }
+
+  wg.wait()
+  println("end")
+}

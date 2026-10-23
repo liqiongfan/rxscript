@@ -1,0 +1,28 @@
+//
+// The RXScript author
+//
+
+class Ticker {
+
+  public Ticker(duration) { this.t = newTicker(duration) }
+
+  public stop() { stopTicker(this.t) }
+
+  public reset(duration) { resetTicker(this.t, duration) }
+
+  public on() { return this.t }
+
+}
+
+
+class Timer {
+
+  public Timer(duration) { this.t = newTimer(duration) }
+
+  public stop() { stopTimer(this.t) }
+
+  public reset(duration) { resetTimer(this.t, duration) }
+
+  public on() { return this.t }
+
+}

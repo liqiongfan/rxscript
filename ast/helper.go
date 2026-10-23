@@ -1,0 +1,132 @@
+//
+// The RXScript author
+// engine helper functions to operate the raw RXScript value
+
+package ast
+
+import (
+	"fmt"
+)
+
+func convertToBool(qv any, e RxeHandler) bool {
+	qv = rawValue(qv, e)
+	switch q := qv.(type) {
+	case int64:
+		return q > 0
+	case float64:
+		return q > 0
+	case string:
+		return q != ``
+	case bool:
+		return q
+	case nil:
+		return false
+	default:
+		return true
+	}
+}
+
+func fetchFromRxe(e RxeHandler, name string) any {
+	// from args
+	if v, ok := e.GetFromArgs(name); ok {
+		return v
+	}
+
+	// from global variables
+	if v, ok := e.GetFromVariables(name); ok {
+		return v
+	}
+
+	// from func
+	if v, ok := e.GetFromFuncDefs(name); ok {
+		return v
+	}
+
+	// from class
+	if v, ok := e.GetFromClassDefs(name); ok {
+		// deal with inherit
+		v := v.(*ClassDef)
+		if v.Base != nil && len(v.Base) > 0 {
+			recursiveClassBase(e, v, v.Base)
+		}
+		return v
+	}
+
+	// from package
+	if v, ok := e.GetFromPackageDefs(name); ok {
+		return v
+	}
+
+	// build-in function list
+	if v := fetchBuildInFunc(name); v != nil {
+		return v
+	}
+
+	// not found
+	return &SystemErrorDef{Value: fmt.Sprintf("RXScript: unknown variables '%s', please define it before you use.", name)}
+}
+
+func recursiveClassBase(e RxeHandler, base *ClassDef, baseClass []string) Node {
+	bodyDef := make([]*ClassBodyDef, 0, 32)
+	for _, baseName := range baseClass {
+		if parentClass, ok := e.GetFromClassDefs(baseName); !ok {
+			return &SystemErrorDef{Value: "RXScript: class not defined: " + baseName}
+		} else {
+			parent := parentClass.(*ClassDef)
+			if parent.Base != nil && len(parent.Base) > 0 {
+				recursiveClassBase(e, base, parent.Base)
+			}
+			for _, stmt := range parent.Body {
+				if stmt.IsPrivate {
+					continue
+				}
+				bodyDef = append(bodyDef, stmt)
+			}
+		}
+	}
+	base.Body = append(base.Body, bodyDef...)
+	return &NullDef{}
+}
+
+func fetchFromClassInstance(ci *Class, name string) (any, bool /*isPublic*/) {
+	if v, ok := ci.GetVariables(name); ok {
+		isPublic := true
+		for _, stmt := range ci.def.Body {
+			if stmt.Name == name && stmt.IsPrivate {
+				isPublic = false
+			}
+		}
+		return v, isPublic
+	}
+
+	// method or attribute
+	ma := ci.GetClassBodyDefByName(name)
+	if ma != nil {
+		return ma, ma.IsPublic
+	}
+
+	return fetchFromClassDef(ci.GetClassDef(), name)
+}
+
+func fetchFromClassDef(cd *ClassDef, name string) (any, bool) {
+	// method or attribute
+	for _, stmt := range cd.Body {
+		if stmt.Name == name {
+			return stmt.Value, stmt.IsPublic
+		}
+	}
+
+	return &SystemErrorDef{Value: fmt.Sprintf("RXScript: unknown attr: '%s' in class: '%s'", name, cd.Name)}, false
+}
+
+func fetchFromPackage(cd *Package, name string) any {
+	if v, ok := cd.GetClassDefByName(name); ok {
+		return v
+	}
+
+	if v, ok := cd.GetFuncDefByName(name); ok {
+		return v
+	}
+
+	return &SystemErrorDef{Value: fmt.Sprintf("RXScript: unknown attr: '%s' in package: '%s'", name, cd.Name)}
+}

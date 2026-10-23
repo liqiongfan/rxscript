@@ -1,0 +1,63 @@
+//
+// The RXScript author
+// String class, defines the strings batch operation.
+
+class String {
+  private val = null
+
+  // constructor
+  public String(buff) {
+    this.val = buff
+  }
+
+  // index returns the index of the first instance of substr in s, or -1 if substr is not present in s.
+  public index(substr) {
+    return index(this.val, substr)
+  }
+
+  // lastIndex returns the index of the last instance of substr in s, or -1 if substr is not present in s.
+  public lastIndex(substr) {
+    return lastIndex(this.val, substr)
+  }
+
+  // trim returns a slice of the string s with all leading and
+  // trailing Unicode code points contained in cutset removed.
+  public trim(cut) {
+    return trim(this.val, cut)
+  }
+
+  // trimLeft returns a slice of the string s with all leading
+  // Unicode code points c satisfying f(c) removed.
+  public trimLeft(cut) {
+    return trimLeft(this.val, cut)
+  }
+
+  // trimRight returns a slice of the string s with all trailing
+  // Unicode code points c satisfying f(c) removed.
+  public trimRight(cut) {
+    return trimRight(this.val, cut)
+  }
+
+  // format returns a formated string with the given args
+  public format(args ...) {
+    return format(this.val, args...)
+  }
+
+  // explode slices s into all substrings separated by sep and returns a slice of
+  // the substrings between those separators.
+  //
+  // If s does not contain sep and sep is not empty, explode returns a
+  // slice of length 1 whose only element is s.
+  //
+  // If cut is empty, explode splits after each UTF-8 sequence. If both s
+  // and cut are empty, Split returns an empty slice.
+  public explode(cut) {
+    return explode(this.val, cut)
+  }
+
+  // join concatenates the elements of its first argument to create a single string. The separator
+  // string concat is placed between elements in the resulting string.
+  public join(concat) {
+    return join(this.val, concat)
+  }
+}

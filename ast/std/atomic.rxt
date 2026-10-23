@@ -1,0 +1,19 @@
+//
+// The RXScript author
+// Atomic class defines the atomic int64 operation, make sure the operation is atomic.
+
+class Atomic {
+  private val = null
+
+  public Atomic(value) {
+    this.val = atomicInt(value)
+  }
+
+  public store(v) {
+    storeAtomicInt(this.val, v)
+  }
+
+  public load() {
+    return readAtomicInt(this.val)
+  }
+}

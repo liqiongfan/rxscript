@@ -1,0 +1,28 @@
+//
+// The RXScript author
+// Http class, encapsulate the HTTP operate.
+//
+
+class Http {
+  private req = null
+
+  // Http method
+  // method: HTTP method, such as GET, PUT, DELETE, POST, OPTIONS, and so on
+  // url: HTTP URL
+  // data: post data, if you don't post data to server, set it to null
+  public Http(method, url, data) {
+    this.req = newHttp(method, url, data)
+  }
+
+  // addHeader add http request headers
+  // name: string header name
+  // value: string header value
+  public addHeader(name, value) {
+    setHttpHeader(this.req, name, value)
+  }
+
+  // do invoke an http request and get the response return.
+  public do() {
+    return httpDo(this.req)
+  }
+}
