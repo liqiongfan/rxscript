@@ -11,12 +11,7 @@ type SplitArrayDef struct {
 }
 
 func (x *SplitArrayDef) Any(handler RxeHandler) any {
-
 	return (&ArrayDef{Value: CheckSystemError(x.Execute(handler), handler).([]Node)}).Any(handler)
-}
-
-func (x *SplitArrayDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
 }
 
 func (x *SplitArrayDef) Type() CmdType {
@@ -34,5 +29,5 @@ func (x *SplitArrayDef) Execute(e RxeHandler) any {
 }
 
 func (x *SplitArrayDef) String() string {
-	return `...`
+	return `object(...)`
 }

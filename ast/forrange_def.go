@@ -18,7 +18,7 @@ func (x *ForRangeDef) Any(handler RxeHandler) any {
 }
 
 func (x *ForRangeDef) String() string {
-	return "'for range'"
+	return "object(for range)"
 }
 
 // Type ForRangeDefAstCmd

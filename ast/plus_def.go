@@ -28,38 +28,66 @@ func (x *PlusDef) Type() CmdType {
 }
 
 func (x *PlusDef) Execute(e RxeHandler) any {
-	a := rawValue(x.A.Execute(e), e)
-	b := rawValue(x.B.Execute(e), e)
+	x1 := rawValue(x.A.Execute(e), e)
+	x2 := rawValue(x.B.Execute(e), e)
 
-	switch a.(type) {
+	switch a := x1.(type) {
 	case int64:
-		switch b.(type) {
+		switch b := x2.(type) {
 		case int64:
-			return &IntDef{Value: a.(int64) + b.(int64)}
+			return &IntDef{Value: a + b}
 		case float64:
-			return &DoubleDef{Value: float64(a.(int64)) + b.(float64)}
+			return &DoubleDef{Value: float64(a) + b}
+		case string:
+			bb, ok := new(big.Rat).SetString(b)
+			if !ok {
+				goto err
+			}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Add(
+				new(big.Rat).SetInt64(a), bb).FloatString(FloatPrecisionWidth))}
 		}
 	case float64:
-		switch b.(type) {
+		switch b := x2.(type) {
 		case int64:
-			return &DoubleDef{Value: a.(float64) + float64(b.(int64))}
+			return &DoubleDef{Value: a + float64(b)}
 		case float64:
-			return &DoubleDef{Value: a.(float64) + b.(float64)}
+			return &DoubleDef{Value: a + b}
+		case string:
+			bb, ok := new(big.Rat).SetString(b)
+			if !ok {
+				goto err
+			}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Add(
+				new(big.Rat).SetFloat64(a), bb).FloatString(FloatPrecisionWidth))}
 		}
 	case string:
-		switch b.(type) {
+		switch b := x2.(type) {
+		case int64:
+			ab, ok := new(big.Rat).SetString(a)
+			if !ok {
+				goto err
+			}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Add(ab,
+				new(big.Rat).SetInt64(b)).FloatString(FloatPrecisionWidth))}
+		case float64:
+			ab, ok := new(big.Rat).SetString(a)
+			if !ok {
+				goto err
+			}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Add(ab,
+				new(big.Rat).SetFloat64(b)).FloatString(FloatPrecisionWidth))}
 		case string:
-			ab, ok := new(big.Int).SetString(a.(string), 10)
+			ab, ok := new(big.Rat).SetString(a)
 			if !ok {
-				return &StringDef{Value: a.(string) + b.(string)}
+				goto err
 			}
-			bb, ok := new(big.Int).SetString(b.(string), 10)
+			bb, ok := new(big.Rat).SetString(b)
 			if !ok {
-				return &StringDef{Value: a.(string) + b.(string)}
+				goto err
 			}
-			return &StringDef{Value: new(big.Int).Add(ab, bb).String()}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Add(ab, bb).FloatString(FloatPrecisionWidth))}
 		}
 	}
-
-	return ThrowSystemErrorWithFormat("RXScript: cannot apply operator '+' to types '%T' and '%T'", a, b)
+err:
+	return ThrowSystemErrorWithFormat("RXScript: cannot apply operator '+' to types '%T' and '%T'", x1, x2)
 }

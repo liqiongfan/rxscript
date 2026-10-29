@@ -24,6 +24,21 @@ func (x *ClassDef) Type() CmdType {
 
 // NewInstance create a class object, like new Class
 func (x *ClassDef) NewInstance(args []any, e RxeHandler) *Class {
+
+	newArgs := make([]any, 0, len(args))
+	for _, arg := range args {
+		switch arg := arg.(type) {
+		case *SplitArrayDef:
+			explodeArgs := CheckSystemError(arg.Execute(e), e)
+			for _, val := range explodeArgs.([]Node) {
+				newArgs = append(newArgs, RawAstNode(val, e))
+			}
+		default:
+			newArgs = append(newArgs, RawAstNode(arg, e))
+		}
+	}
+	args = newArgs
+
 	// construct class instance
 	ci := &Class{
 		Name:      x.Name,
@@ -39,15 +54,6 @@ func (x *ClassDef) NewInstance(args []any, e RxeHandler) *Class {
 	// set class def instance to `ci`
 	x.owner = ci
 
-	// copy class default value to instance
-	for _, stmt := range x.Body {
-		if stmt.IsMethod {
-			continue
-		}
-		// when constructor run, the object value need to be calculated
-		ci.variables[stmt.Name] = RawAstNode(stmt.Value, e).(Node)
-	}
-
 	// calling constructor if exists and is public
 	for _, stmt := range x.Body {
 		if !stmt.IsMethod {
@@ -60,15 +66,16 @@ func (x *ClassDef) NewInstance(args []any, e RxeHandler) *Class {
 			// call constructor function
 			// prepare calling args
 			callArgs := NewNodeStore()
-			callArgs.Set("this", ci)
+			callArgs.Set(ThisVar, ci)
 
 			xArgsNum := len(stmt.Args)
+			realArgsNum := len(args)
 			for i := 0; i < xArgsNum; i++ {
 				arg := stmt.Args[i]
-				if arg == `...` {
+				if arg == OmitMore {
 					previousArg := stmt.Args[i-1]
 					arrayValue := &ArrayDef{Value: make([]Node, 0, xArgsNum-i+1)}
-					for k := i - 1; k < xArgsNum; k++ {
+					for k := i - 1; k <= realArgsNum-1; k++ {
 						arrayValue.Value = append(arrayValue.Value, args[k].(Node))
 						i++
 					}
@@ -79,7 +86,16 @@ func (x *ClassDef) NewInstance(args []any, e RxeHandler) *Class {
 			}
 			e.PushArgStack(callArgs)
 
-			stmt.Body.Execute(e)
+			e.PushClassDef(x)
+
+			ret := stmt.Body.Execute(e)
+			switch ret.(type) {
+			case *BreakDef:
+				CheckSystemError(ThrowSystemErrorWithFormat(
+					"RXScript: break can only be used in for statements"), e)
+			}
+
+			e.PopClassDef()
 
 			e.PopArgStack()
 			return ci

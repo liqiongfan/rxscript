@@ -38,6 +38,13 @@ func (x *MinusDef) Execute(e RxeHandler) any {
 			return &IntDef{Value: a - b}
 		case float64:
 			return &DoubleDef{Value: float64(a) - b}
+		case string:
+			bb, ok := new(big.Rat).SetString(b)
+			if !ok {
+				goto err
+			}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Sub(
+				new(big.Rat).SetInt64(a), bb).FloatString(FloatPrecisionWidth))}
 		}
 	case float64:
 		switch b := x2.(type) {
@@ -45,19 +52,40 @@ func (x *MinusDef) Execute(e RxeHandler) any {
 			return &DoubleDef{Value: a - float64(b)}
 		case float64:
 			return &DoubleDef{Value: a - b}
+		case string:
+			bb, ok := new(big.Rat).SetString(b)
+			if !ok {
+				goto err
+			}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Sub(
+				new(big.Rat).SetFloat64(a), bb).FloatString(FloatPrecisionWidth))}
 		}
 	case string:
 		switch b := x2.(type) {
+		case int64:
+			ab, ok := new(big.Rat).SetString(a)
+			if !ok {
+				goto err
+			}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Sub(ab,
+				new(big.Rat).SetInt64(b)).FloatString(FloatPrecisionWidth))}
+		case float64:
+			ab, ok := new(big.Rat).SetString(a)
+			if !ok {
+				goto err
+			}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Sub(ab,
+				new(big.Rat).SetFloat64(b)).FloatString(FloatPrecisionWidth))}
 		case string:
-			ab, ok := new(big.Int).SetString(a, 10)
+			ab, ok := new(big.Rat).SetString(a)
 			if !ok {
 				goto err
 			}
-			bb, ok := new(big.Int).SetString(b, 10)
+			bb, ok := new(big.Rat).SetString(b)
 			if !ok {
 				goto err
 			}
-			return &StringDef{Value: new(big.Int).Sub(ab, bb).String()}
+			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Sub(ab, bb).FloatString(FloatPrecisionWidth))}
 		}
 	}
 err:

@@ -4,9 +4,7 @@
 
 package ast
 
-import (
-	"fmt"
-)
+import "strings"
 
 func convertToBool(qv any, e RxeHandler) bool {
 	qv = rawValue(qv, e)
@@ -19,13 +17,22 @@ func convertToBool(qv any, e RxeHandler) bool {
 		return q != ``
 	case bool:
 		return q
+	case []any:
+		return len(q) > 0
+	case chan any:
+		return len(q) > 0
+	case map[string]any:
+		return len(q) > 0
+	case *SplitArrayDef:
+		return len(CheckSystemError(q.Execute(e), e).([]Node)) > 0
 	case nil:
 		return false
 	default:
-		return true
+		return false
 	}
 }
 
+// fetchFromRxe from environment to fetch value
 func fetchFromRxe(e RxeHandler, name string) any {
 	// from args
 	if v, ok := e.GetFromArgs(name); ok {
@@ -63,9 +70,13 @@ func fetchFromRxe(e RxeHandler, name string) any {
 	}
 
 	// not found
-	return &SystemErrorDef{Value: fmt.Sprintf("RXScript: unknown variables '%s', please define it before you use.", name)}
+	return ThrowSystemErrorWithFormat(
+		"RXScript: unknown variables '%s', please define it before you use.",
+		name,
+	)
 }
 
+// recursiveClassBase do with the class inherit
 func recursiveClassBase(e RxeHandler, base *ClassDef, baseClass []string) Node {
 	bodyDef := make([]*ClassBodyDef, 0, 32)
 	for _, baseName := range baseClass {
@@ -80,6 +91,7 @@ func recursiveClassBase(e RxeHandler, base *ClassDef, baseClass []string) Node {
 				if stmt.IsPrivate {
 					continue
 				}
+				stmt.ClassName = parent.Name
 				bodyDef = append(bodyDef, stmt)
 			}
 		}
@@ -88,37 +100,66 @@ func recursiveClassBase(e RxeHandler, base *ClassDef, baseClass []string) Node {
 	return &NullDef{}
 }
 
-func fetchFromClassInstance(ci *Class, name string) (any, bool /*isPublic*/) {
+// fetchFromClassInstance fetch data from object instance
+func fetchFromClassInstance(e RxeHandler, ci *Class, name string) (
+	any, bool /*isPublic*/, bool /* is dynamic*/) {
 	if v, ok := ci.GetVariables(name); ok {
-		isPublic := true
-		for _, stmt := range ci.def.Body {
-			if stmt.Name == name && stmt.IsPrivate {
-				isPublic = false
-			}
-		}
-		return v, isPublic
+		// GetVariables is public or dynamic set
+		return v, true, true
 	}
 
-	// method or attribute
-	ma := ci.GetClassBodyDefByName(name)
+	// method or attribute from object instance
+	ma := ci.GetClassBodyDefByName(e, name)
 	if ma != nil {
-		return ma, ma.IsPublic
+		if ma.IsMethod {
+			// constructor
+			if ma.Name == ma.ClassName {
+				return ma, ma.IsPublic, true
+			}
+			// not constructor
+			return ma, ma.IsPublic, false
+		}
+		// not method, need execute the node to fetch the value
+		return RawAstNode(ma.Value, e), ma.IsPublic, false
 	}
 
-	return fetchFromClassDef(ci.GetClassDef(), name)
+	// not from instance, from class
+	v, ok := fetchFromClassDef(e, ci.GetClassDef(), name)
+	return v, ok, false
 }
 
-func fetchFromClassDef(cd *ClassDef, name string) (any, bool) {
+// fetchFromClassDef fetch from class definition
+func fetchFromClassDef(e RxeHandler, cd *ClassDef, name string) (any, bool) {
+	className := cd.Name
+	currentClassDef := e.GetCurrentClassDef()
+	if currentClassDef != nil {
+		className = currentClassDef.Name
+	}
+
 	// method or attribute
 	for _, stmt := range cd.Body {
-		if stmt.Name == name {
-			return stmt.Value, stmt.IsPublic
+		if stmt.Name == name && cd.Name == stmt.ClassName {
+			if stmt.IsMethod {
+				// constructor
+				if stmt.Name == stmt.ClassName {
+					return stmt, true
+				}
+				// not constructor
+				return stmt.Body, stmt.IsPublic
+			}
+			// not method
+			return RawAstNode(stmt.Value, e), stmt.IsPublic
 		}
 	}
 
-	return &SystemErrorDef{Value: fmt.Sprintf("RXScript: unknown attr: '%s' in class: '%s'", name, cd.Name)}, false
+	return ThrowSystemErrorWithFormat(
+		"RXScript: unknown attr: '%s' in class: '%s'",
+		name,
+		className,
+	), false
 }
 
+// fetchFromPackage fetch from package
 func fetchFromPackage(cd *Package, name string) any {
 	if v, ok := cd.GetClassDefByName(name); ok {
 		return v
@@ -128,5 +169,18 @@ func fetchFromPackage(cd *Package, name string) any {
 		return v
 	}
 
-	return &SystemErrorDef{Value: fmt.Sprintf("RXScript: unknown attr: '%s' in package: '%s'", name, cd.Name)}
+	return ThrowSystemErrorWithFormat(
+		"RXScript: unknown attr: '%s' in package: '%s'",
+		name,
+		cd.Name,
+	)
+}
+
+// StripTrailingZeros trim right ending zero.
+func StripTrailingZeros(s string) string {
+	if strings.Contains(s, ".") {
+		s = strings.TrimRight(s, "0")
+		s = strings.TrimRight(s, ".")
+	}
+	return s
 }

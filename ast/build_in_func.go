@@ -14,7 +14,7 @@ func fetchBuildInFunc(name string) any {
 		return NewListDir()
 	case `getTimeResource`, `time`:
 		return NewTime()
-	case `getLocation`:
+	case `getLocation`, `parseLocation`:
 		return NewLocation()
 	case `isInt`:
 		return NewIsInt()
@@ -74,6 +74,8 @@ func fetchBuildInFunc(name string) any {
 		return NewLastIndex()
 	case `format`:
 		return NewFormat()
+	case `scanf`:
+		return NewScanf()
 	case `explode`:
 		return NewExplode()
 	case `join`:
@@ -96,6 +98,16 @@ func fetchBuildInFunc(name string) any {
 		return NewResetTicker()
 	case `newTicker`:
 		return NewNewTicker()
+	case `arrayPush`:
+		return NewArrayPush()
+	case `arrayPop`:
+		return NewArrayPop()
+	case `arrayShift`:
+		return NewArrayShift()
+	case `toString`:
+		return NewToString()
+	case `toInt`:
+		return NewToInt()
 	default:
 		return nil
 	}

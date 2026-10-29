@@ -4,6 +4,8 @@
 
 package ast
 
+import "math/big"
+
 var _ Node = (*PlusDoubleDef)(nil)
 
 type PlusDoubleDef struct {
@@ -29,6 +31,14 @@ func (p *PlusDoubleDef) Execute(e RxeHandler) any {
 	case float64:
 		ov = &DoubleDef{Value: n}
 		ret = &DoubleDef{Value: n + 1}
+	case string:
+		na, ok := new(big.Rat).SetString(n)
+		if !ok {
+			return ThrowSystemErrorWithFormat("RXScript: cannot apply operator '++' to types '%T'", x)
+		}
+		r := new(big.Rat).Add(na, new(big.Rat).SetInt64(1))
+		ret = &StringDef{Value: StripTrailingZeros(r.FloatString(FloatPrecisionWidth))}
+		ov = &StringDef{Value: n}
 	default:
 		return ThrowSystemErrorWithFormat("RXScript: cannot apply operator '++' to types '%T'", x)
 	}

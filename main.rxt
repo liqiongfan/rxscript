@@ -2,7 +2,7 @@
 // The RXScript author
 //
 
-import std as std
+import std 
 
 main() {
   wg = std.WaitGroup()
@@ -20,6 +20,7 @@ main() {
       println("goroutine 1")
       sleep(500.0)
     }
+    println("num=", num)
   }
 
   wg.add(1)

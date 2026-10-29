@@ -29,5 +29,5 @@ func (x *WaitDef) Execute(e RxeHandler) any {
 }
 
 func (x *WaitDef) String() string {
-	return "'wait'"
+	return "object(wait)"
 }

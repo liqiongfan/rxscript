@@ -15,10 +15,6 @@ func (x *OrDef) Any(handler RxeHandler) any {
 	return CheckSystemError(x.Execute(handler), handler).(Node).Any(handler)
 }
 
-func (x *OrDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
-}
-
 func (x *OrDef) String() string {
 	return "'||'"
 }

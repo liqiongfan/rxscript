@@ -21,8 +21,10 @@ func NewPrintln() *Println {
 func (p *Println) Execute(rxe RxeHandler) any {
 	rawData := make([]any, 0, len(p.Args))
 	for _, arg := range p.Args {
+		//print(NodeStringValue(arg, rxe), " ")
 		rawData = append(rawData, NodeStringValue(arg, rxe))
 	}
+	//println()
 	fmt.Println(rawData...)
 	return nil
 }

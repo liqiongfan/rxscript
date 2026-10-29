@@ -4,6 +4,8 @@
 
 package ast
 
+import "math/big"
+
 var _ Node = (*MinusDoubleDef)(nil)
 
 type MinusDoubleDef struct {
@@ -29,6 +31,14 @@ func (p *MinusDoubleDef) Execute(e RxeHandler) any {
 	case float64:
 		ov = &DoubleDef{Value: n}
 		ret = &DoubleDef{Value: n - 1}
+	case string:
+		bb, ok := new(big.Rat).SetString(n)
+		if !ok {
+			return ThrowSystemErrorWithFormat("RXScript: cannot apply operator '--' to types '%T'", x)
+		}
+		ov = &StringDef{Value: n}
+		ret = &StringDef{Value: new(big.Rat).Sub(bb, new(big.Rat).SetInt64(1)).
+			FloatString(FloatPrecisionWidth)}
 	default:
 		return ThrowSystemErrorWithFormat("RXScript: cannot apply operator '--' to types '%T'", x)
 	}

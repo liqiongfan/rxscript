@@ -35,6 +35,14 @@ func (p *MinusEqualDef) Execute(e RxeHandler) any {
 			ret = &IntDef{Value: x1 - x2}
 		case float64:
 			ret = &DoubleDef{Value: float64(x1) - x2}
+		case string:
+			bb, ok := new(big.Rat).SetString(x2)
+			if !ok {
+				goto err
+			}
+			ret = &StringDef{Value: StripTrailingZeros(
+				new(big.Rat).Sub(
+					new(big.Rat).SetInt64(x1), bb).FloatString(FloatPrecisionWidth))}
 		default:
 			goto err
 		}
@@ -44,21 +52,44 @@ func (p *MinusEqualDef) Execute(e RxeHandler) any {
 			ret = &DoubleDef{Value: x1 - float64(x2)}
 		case float64:
 			ret = &DoubleDef{Value: x1 - x2}
+		case string:
+			bb, ok := new(big.Rat).SetString(x2)
+			if !ok {
+				goto err
+			}
+			ret = &StringDef{Value: StripTrailingZeros(
+				new(big.Rat).Sub(
+					new(big.Rat).SetFloat64(x1), bb).FloatString(FloatPrecisionWidth))}
 		default:
 			goto err
 		}
 	case string:
 		switch x2 := x2.(type) {
+		case int64:
+			ab, ok := new(big.Rat).SetString(x1)
+			if !ok {
+				goto err
+			}
+			ret = &StringDef{Value: StripTrailingZeros(new(big.Rat).Sub(ab,
+				new(big.Rat).SetInt64(x2)).FloatString(FloatPrecisionWidth))}
+		case float64:
+			ab, ok := new(big.Rat).SetString(x1)
+			if !ok {
+				goto err
+			}
+			ret = &StringDef{Value: StripTrailingZeros(new(big.Rat).Sub(ab,
+				new(big.Rat).SetFloat64(x2)).FloatString(FloatPrecisionWidth))}
 		case string:
-			ab, ok := new(big.Int).SetString(x1, 10)
+			ab, ok := new(big.Rat).SetString(x1)
 			if !ok {
 				goto err
 			}
-			bb, ok := new(big.Int).SetString(x2, 10)
+			bb, ok := new(big.Rat).SetString(x2)
 			if !ok {
 				goto err
 			}
-			ret = &StringDef{Value: new(big.Int).Sub(ab, bb).String()}
+			ret = &StringDef{Value: StripTrailingZeros(
+				new(big.Rat).Sub(ab, bb).FloatString(FloatPrecisionWidth))}
 		default:
 			goto err
 		}
@@ -77,8 +108,12 @@ func (p *MinusEqualDef) Execute(e RxeHandler) any {
 		default:
 			return ThrowSystemErrorWithFormat("RXScript: cannot found object with name: '%s'", stmt.Object)
 		}
+	case *VariableDef:
+		e.SetArgs(stmt.Name, ret)
+		return ret
 	default:
-		e.SetArgs(x1.(string), ret)
+		name := rawValue(p.A, e)
+		e.SetArgs(name.(string), ret)
 		return ret
 	}
 

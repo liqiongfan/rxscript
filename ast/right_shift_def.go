@@ -20,7 +20,7 @@ func (x *RightShiftDef) Any(handler RxeHandler) any {
 }
 
 func (x *RightShiftDef) String() string {
-	return "'>>'"
+	return "object(>>)"
 }
 
 func (x *RightShiftDef) Type() CmdType {
@@ -36,19 +36,31 @@ func (x *RightShiftDef) Execute(e RxeHandler) any {
 		switch b.(type) {
 		case int64:
 			return &IntDef{Value: a.(int64) >> b.(int64)}
+		case string:
+			bb, ok := new(big.Rat).SetString(b.(string))
+			if !ok || !bb.IsInt() {
+				goto err
+			}
+			return &IntDef{Value: a.(int64) >> bb.Num().Int64()}
 		}
 	case string:
 		switch b.(type) {
 		case string:
-			ab, ok := new(big.Int).SetString(a.(string), 10)
-			if !ok {
+			ab, ok := new(big.Rat).SetString(a.(string))
+			if !ok || !ab.IsInt() {
 				goto err
 			}
-			bb, ok := new(big.Int).SetString(b.(string), 10)
-			if !ok {
+			bb, ok := new(big.Rat).SetString(b.(string))
+			if !ok || !bb.IsInt() {
 				goto err
 			}
-			return &IntDef{Value: ab.Int64() >> bb.Int64()}
+			return &IntDef{Value: ab.Num().Int64() >> bb.Num().Int64()}
+		case int64:
+			ab, ok := new(big.Rat).SetString(a.(string))
+			if !ok || !ab.IsInt() {
+				goto err
+			}
+			return &IntDef{Value: ab.Num().Int64() >> b.(int64)}
 		}
 	}
 err:

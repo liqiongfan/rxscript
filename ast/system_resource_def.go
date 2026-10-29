@@ -19,7 +19,7 @@ func (s *SystemResource) Any(handler RxeHandler) any {
 }
 
 func (s *SystemResource) String() string {
-	return "'resource'"
+	return "object(Res)"
 }
 
 func (s *SystemResource) Execute(handler RxeHandler) any {

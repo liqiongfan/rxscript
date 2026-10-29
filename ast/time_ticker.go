@@ -27,5 +27,5 @@ func (x *TimeTicker) Execute(e RxeHandler) any {
 }
 
 func (x *TimeTicker) String() string {
-	return "'time.Ticker'"
+	return "object(ticker)"
 }

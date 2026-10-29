@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	goNum       int
-	debug       int
-	author      bool
-	showVersion bool
+	goNum                int
+	debug                int
+	author               bool
+	showVersion          bool
+	StringFloatPrecision int
 )
 
 func NewOptimizedClient() *http.Client {
@@ -55,6 +56,7 @@ func init() {
 	flag.IntVar(&debug, "debug", 0, "debug level")
 	flag.BoolVar(&author, "a", false, "show author")
 	flag.BoolVar(&showVersion, "v", false, "show RXScript version")
+	flag.IntVar(&StringFloatPrecision, "p", 32, "Float string value precision")
 }
 
 func main() {
@@ -69,5 +71,8 @@ func main() {
 	if len(os.Args) < 1 {
 		log.Fatal("No RXScript file specified")
 	}
+
+	ast.FloatPrecisionWidth = StringFloatPrecision
+
 	ast.RunScript(os.Args[0], debug, goNum)
 }

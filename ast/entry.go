@@ -14,6 +14,11 @@ import (
 	_ "embed"
 )
 
+const (
+	OmitMore = `...`
+	ThisVar  = `this`
+)
+
 // stdLibrary is the RXScript programming language's standard library, which written in RXScript.
 var (
 	//go:embed std/*

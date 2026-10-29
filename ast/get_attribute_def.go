@@ -30,22 +30,52 @@ func (x *GetAttributeDef) Execute(e RxeHandler) any {
 	switch obj := obj.(type) {
 	case *Class:
 		e.SetCallingObject(obj)
-		ret, isPublic := fetchFromClassInstance(obj, x.Attribute)
 
+		// fetch from class object.
+		ret, isPublic, isDynamic := fetchFromClassInstance(e, obj, x.Attribute)
+
+		// check return value throw error.
 		ret = CheckSystemError(ret, e)
+
+		// fetch current class scope.
+		currentClassDef := e.GetCurrentClassDef()
+
+		// public method or attr. return direct.
 		if isPublic {
 			return ret
 		}
 
+		// if is dynamic or operation in class self.
+		// otherwise check attr. is existed, if not exist, throw error.
+		if !isDynamic &&
+			(currentClassDef != nil && obj.Name != currentClassDef.Name) {
+			var isDefined = false
+			for _, defineOk := range currentClassDef.Body {
+				if defineOk.Name == x.Attribute {
+					isDefined = true
+				}
+			}
+			if !isDefined {
+				return ThrowSystemErrorWithFormat(
+					"RXScript: attribute '%s' not defined in class '%s'",
+					x.Attribute,
+					currentClassDef.Name,
+				)
+			}
+		}
+
+		// if got from this, return direct.
 		switch raw := x.Object.(type) {
 		case *VariableDef:
-			if raw.Name == "this" {
+			if raw.Name == ThisVar {
 				return ret
 			}
 		}
+
+		// otherwise return error.
 		return ThrowSystemErrorWithFormat("RXScript: '%s.%s' is private, can't access out of class", obj.Name, x.Attribute)
 	case *ClassDef:
-		v, _ := fetchFromClassDef(obj, x.Attribute)
+		v, _ := fetchFromClassDef(e, obj, x.Attribute)
 		return v
 	case *Package:
 		return fetchFromPackage(obj, x.Attribute)
@@ -58,6 +88,10 @@ func (x *GetAttributeDef) Execute(e RxeHandler) any {
 		obj.Values[x.Attribute] = &DictionaryDef{Values: map[string]Node{}}
 		return obj.Values[x.Attribute]
 	default:
-		return ThrowSystemErrorWithFormat("RXScript: the attribute '%s' is not defined in '%s'", x.Attribute, x.Object)
+		return ThrowSystemErrorWithFormat(
+			"RXScript: the attribute '%s' is not defined in '%s'",
+			x.Attribute,
+			x.Object,
+		)
 	}
 }

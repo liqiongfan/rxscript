@@ -50,17 +50,18 @@ func (p *PlusEqualDef) Execute(e RxeHandler) any {
 	case string:
 		switch x2 := x2.(type) {
 		case string:
-			ab, ok := new(big.Int).SetString(x1, 10)
+			ab, ok := new(big.Rat).SetString(x1)
 			if !ok {
 				ret = &StringDef{Value: x1 + x2}
 				goto variableSet
 			}
-			bb, ok := new(big.Int).SetString(x2, 10)
+			bb, ok := new(big.Rat).SetString(x2)
 			if !ok {
 				ret = &StringDef{Value: x2 + x2}
 				goto variableSet
 			}
-			ret = &StringDef{Value: new(big.Int).Add(ab, bb).String()}
+			v := new(big.Rat).Add(ab, bb)
+			ret = &StringDef{Value: StripTrailingZeros(v.FloatString(FloatPrecisionWidth))}
 		default:
 			goto err
 		}
@@ -80,8 +81,12 @@ variableSet:
 		default:
 			return ThrowSystemErrorWithFormat("RXScript: cannot found object with name: '%s'", stmt.Object)
 		}
+	case *VariableDef:
+		e.SetArgs(stmt.Name, ret)
+		return ret
 	default:
-		e.SetArgs(x1.(string), ret)
+		name := rawValue(p.A, e)
+		e.SetArgs(name.(string), ret)
 		return ret
 	}
 

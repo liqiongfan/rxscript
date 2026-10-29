@@ -14,12 +14,8 @@ func (x *ReturnDef) Any(handler RxeHandler) any {
 	return CheckSystemError(x.Execute(handler), handler).(Node).Any(handler)
 }
 
-func (x *ReturnDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
-}
-
 func (x *ReturnDef) String() string {
-	return "'return'"
+	return "object(return)"
 }
 
 func (x *ReturnDef) Type() CmdType {

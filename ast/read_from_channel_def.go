@@ -14,10 +14,6 @@ func (x *ReadFromChannelDef) Any(handler RxeHandler) any {
 	return CheckSystemError(x.Execute(handler), handler)
 }
 
-func (x *ReadFromChannelDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
-}
-
 func (x *ReadFromChannelDef) Type() CmdType {
 	return ReadFromChannelDefAstCmd
 }
@@ -37,5 +33,5 @@ func (x *ReadFromChannelDef) Execute(e RxeHandler) any {
 }
 
 func (x *ReadFromChannelDef) String() string {
-	return "<-channel"
+	return "object(<-channel)"
 }

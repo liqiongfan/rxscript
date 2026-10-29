@@ -39,12 +39,26 @@ func (x *Class) GetClassDef() *ClassDef {
 }
 
 // GetClassBodyDefByName Get method or attribute with the name
-func (x *Class) GetClassBodyDefByName(name string) *ClassBodyDef {
+func (x *Class) GetClassBodyDefByName(e RxeHandler, name string) *ClassBodyDef {
+
+	currentClassDef := e.GetCurrentClassDef()
+
+	if currentClassDef != nil && currentClassDef.Name != x.def.Name {
+		// fetch from get current class def
+		for _, stmt := range currentClassDef.Body {
+			if stmt.Name == name {
+				return stmt
+			}
+		}
+	}
+
+	// fetch from the current class
 	for _, stmt := range x.def.Body {
 		if stmt.Name == name {
 			return stmt
 		}
 	}
+
 	return nil
 }
 

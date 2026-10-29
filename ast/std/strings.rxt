@@ -43,6 +43,17 @@ class String {
     return format(this.val, args...)
   }
 
+  // scanf scan the value from val, with the given args...
+  // support `%s` for string
+  // %d, %x, %o, %v for integer
+  // %f, %g, %e for float64
+  // %t for bool true or false
+  // %c for char not support for RXScript
+  // %p for address, not support for RXScript, which not support using & to fetch the address of variables.
+  public scanf(format, args...) {
+    return scanf(this.val, format, args...)
+  }
+
   // explode slices s into all substrings separated by sep and returns a slice of
   // the substrings between those separators.
   //
@@ -57,7 +68,7 @@ class String {
 
   // join concatenates the elements of its first argument to create a single string. The separator
   // string concat is placed between elements in the resulting string.
-  public join(concat) {
-    return join(this.val, concat)
+  public join(data) {
+    return join(data, this.val)
   }
 }

@@ -1,94 +1,20 @@
-//
-// The RXScript author
-//
-
 import std
 
-class A {
-  public A() {
-    this.a = "hello"
-    this.bb = "world"
-  }
-
-  public b = "hello private"
-
-  public say(a ...) {
-    println(a)
-  }
-}
-
 main() {
-  testNest()
+  println("1.00005" / 2.5 + "1.0000000000250" + 1e9)
+  println(toString(0.90010) + "0.8883")
+  println(toString(0.90010) * "0.8883")
+  println(toString(0.90010) / "0.8883")
+  println("100" % "8")
+  println(0x10, toInt("0x10"))
+  println(std.String("%d I Love %s").format(01010, "RXScript"))
 
-  println(true ? false ? "NN" : "YY" : true ? "Yes" : "false")
 
-  println(time().Unix())
-
-  z = {h: A()}
-
-  v = [1,2,3,4, {v: "200", zz: z}]
-
-  a = A()
-  println(a.b)
-  a.say("RXScript", "do", v..., {ab: 20, do: "yes"})
-
-  v = true
-  println(isBool(v))
-
-  println(join([1,2,3,4],","))
-  for i, v = range explode("abc,def,hij,lmn,opq", ",") {
-    println("v=", v)
+  v = ["1.5","1.6", "1.8", "2.11", "3.23", "4.55", "6.66"]
+  total = "0.0"
+  for _, val = range v {
+    total +=  val
+    println(val)
   }
-
-  http = std.Http("GET", "https://www.baidu.com", null)
-  http.addHeader("name", "value")
-  println(http.do())
-
-  // if in `Go`, the result is 4, because `Go` not satisfy the iso standard.
-  println(3 & 10 << 1)
-
-  if 3 & 10 {
-    println("3&10")
-  } else {
-    println("3&10 is false")
-  }
-
-  println(1e-9)
-  println(0b100)
-  println(0107)
-  println(0x13f)
-
-  println({a: 0x00, b: 01234, c: 0x183fea})
-
-/*
-  t = std.Ticker("1s")
-  defer { t.stop() }
-  num = 1
-  for {
-    if num > 10 {
-      break
-    }
-    <- t.on()
-    println("coming", num)
-    num++
-    t.reset(std.String("%ds").format(num))
-  }
-*/
-  return 0
-}
-
-class X {
-  public X() {
-    this.c = channel(10)
-  }
-
-  public on() { return this.c }
-}
-
-testNest() {
-  defer { println("defer") }
-  println("testNest")
-  println("testNest")
-  println("testNest")
-  println("testNest")
+  println(total)
 }

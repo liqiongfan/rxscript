@@ -36,6 +36,12 @@ func (x *BitOrDef) Execute(e RxeHandler) any {
 		switch b.(type) {
 		case int64:
 			return &IntDef{Value: a.(int64) | b.(int64)}
+		case string:
+			bb, ok := new(big.Int).SetString(b.(string), 10)
+			if !ok {
+				goto err
+			}
+			return &IntDef{Value: a.(int64) | bb.Int64()}
 		}
 	case string:
 		switch b.(type) {
@@ -49,6 +55,12 @@ func (x *BitOrDef) Execute(e RxeHandler) any {
 				goto err
 			}
 			return &IntDef{Value: ab.Int64() | bb.Int64()}
+		case int64:
+			ab, ok := new(big.Int).SetString(a.(string), 10)
+			if !ok {
+				goto err
+			}
+			return &IntDef{Value: ab.Int64() | b.(int64)}
 		}
 	}
 err:

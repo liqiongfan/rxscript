@@ -37,7 +37,7 @@ func (x *VariableAssignDef) Execute(e RxeHandler) any {
 					if stmt.Name == a.Attribute && stmt.IsPrivate {
 						switch v := a.Object.(type) {
 						case *VariableDef:
-							if v.Name != `this` {
+							if v.Name != ThisVar {
 								return ThrowSystemErrorWithFormat(
 									"RXScript: %s.%s is private, can't access out of class",
 									obj.Name,
@@ -50,6 +50,15 @@ func (x *VariableAssignDef) Execute(e RxeHandler) any {
 			}
 			obj.variables[a.Attribute] = value.(Node)
 		case *DictionaryDef:
+			switch v := a.Object.(type) {
+			case *VariableDef:
+				if v.Name != ThisVar {
+					return ThrowSystemErrorWithFormat(
+						"RXScript: %s is private, can't access out of class",
+						x.Name.String(),
+					)
+				}
+			}
 			obj.Values[a.Attribute] = value.(Node)
 		default:
 			panic(a)

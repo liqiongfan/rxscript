@@ -24,7 +24,11 @@ func (x *NeDef) Type() CmdType {
 }
 
 func (x *NeDef) Execute(e RxeHandler) any {
-	a := rawValue(x.A.Execute(e), e)
-	b := rawValue(x.B.Execute(e), e)
-	return &BoolDef{Value: a != b}
+	v := checkValueEqual(x.A, x.B, e)
+	switch va := v.(type) {
+	case *BoolDef:
+		return &BoolDef{Value: !va.Value}
+	default:
+		return v
+	}
 }

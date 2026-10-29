@@ -28,6 +28,35 @@ type Rxe struct {
 
 	// goroutine number
 	goroutineChan chan struct{}
+
+	// current class definitions
+	currentClassDef *ClassDef
+	callingScope    []*ClassDef
+}
+
+func (e *Rxe) GetCurrentClassDef() *ClassDef {
+	return e.currentClassDef
+}
+
+func (e *Rxe) SetCurrentClassDef(v *ClassDef) {
+	e.currentClassDef = v
+}
+
+func (e *Rxe) PushClassDef(def *ClassDef) {
+	e.currentClassDef = def
+	e.callingScope = append(e.callingScope, def)
+}
+
+func (e *Rxe) PopClassDef() *ClassDef {
+	e.callingScope = e.callingScope[:len(e.callingScope)-1]
+
+	lastIndex := len(e.callingScope) - 1
+	e.currentClassDef = nil
+	if lastIndex >= 0 {
+		e.currentClassDef = e.callingScope[lastIndex]
+	}
+
+	return e.currentClassDef
 }
 
 func (e *Rxe) GoroutineChan() chan struct{} {

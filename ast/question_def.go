@@ -21,12 +21,8 @@ func (q *QuestionDef) Any(handler RxeHandler) any {
 	return CheckSystemError(q.Execute(handler), handler).(Node).Any(handler)
 }
 
-func (q *QuestionDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
-}
-
 func (q *QuestionDef) String() string {
-	return "'? :'"
+	return "object(?:)"
 }
 
 // Execute the ternary operator

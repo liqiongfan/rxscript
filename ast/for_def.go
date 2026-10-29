@@ -19,7 +19,7 @@ func (x *ForDef) MarshalJSON() ([]byte, error) {
 }
 
 func (x *ForDef) String() string {
-	return "'for'"
+	return "object(for)"
 }
 
 // Type ForRangeDefAstCmd

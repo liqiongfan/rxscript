@@ -4,6 +4,10 @@ const (
 	ScriptSuffix = ".rxt"
 )
 
+var (
+	FloatPrecisionWidth = 32
+)
+
 type ValueType int
 
 const (

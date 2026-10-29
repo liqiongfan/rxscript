@@ -7,6 +7,7 @@ package ast
 import (
 	"fmt"
 	"log"
+	"strconv"
 )
 
 type CmdType int
@@ -20,6 +21,7 @@ const (
 	ClassBodyDefAstCmd
 	ClassDefAstCmd
 	DivideDefAstCmd
+	ModDefAstCmd
 	DoubleDefAstCmd
 	ElseDefAstCmd
 	ElseIfDefAstCmd
@@ -53,6 +55,7 @@ const (
 	MinusDoubleDefAstCmd
 	ForRangeDefAstCmd
 	EqualDoubleDefAstCmd
+	TriEqualDefAstCmd
 	SystemResourceAstCmd
 	GetNodeAttributeDefAstCmd
 	GoDefAstCmd
@@ -116,6 +119,10 @@ type RxeHandler interface {
 	DumpRxe() RxeHandler
 	GoroutineChan() chan struct{}
 	DeleteArgs(names ...string)
+	GetCurrentClassDef() *ClassDef
+	SetCurrentClassDef(*ClassDef)
+	PushClassDef(def *ClassDef)
+	PopClassDef() *ClassDef
 }
 
 type Node interface {
@@ -157,7 +164,6 @@ func (s *SystemErrorDef) Any(handler RxeHandler) any {
 }
 
 func (s *SystemErrorDef) Execute(e RxeHandler) any {
-	//panic(s.Value)
 	log.Fatal(s.Value)
 	return nil
 }
@@ -176,7 +182,7 @@ type FuncDef struct {
 
 // WithArgs parse the input args for built-in functions
 // if argument is b... then b will explode into several arguments
-func (b *FuncDef) WithArgs(e RxeHandler, args ...any) {
+func (b *FuncDef) WithArgs(node any, e RxeHandler, args ...any) {
 	for _, arg := range args {
 		switch arg := arg.(type) {
 		case *SplitArrayDef:
@@ -192,12 +198,6 @@ func (b *FuncDef) WithArgs(e RxeHandler, args ...any) {
 
 func (b *FuncDef) Type() CmdType {
 	return FunctionDefAstCmd
-}
-
-// IFunc each buildin function need implement IFunc interface
-// RXEngine need this interface to set the user input args to buildin func.
-type IFunc interface {
-	WithArgs(e RxeHandler, args ...any)
 }
 
 // RawAstNode fetch the raw value in the RXScript
@@ -272,6 +272,79 @@ func rawValue(qv any, e RxeHandler) any {
 	}
 }
 
+// rawValueToPtr fetch the original value in the RXScript
+// used in RXScript engine && built-in functions.
+func rawValueToPtr(qv any, e RxeHandler) any {
+	for {
+		switch v := qv.(type) {
+		case *IntDef:
+			return &v.Value
+		case *StringDef:
+			return &v.Value
+		case *BoolDef:
+			return &v.Value
+		case *DoubleDef:
+			return &v.Value
+		case *NullDef:
+			return nil
+		case Node:
+			qv = v.Execute(e)
+		default:
+			return &qv
+		}
+	}
+}
+
+// toNodeValue turn Go's base type into RXScript Node type
+// support int, string, bool, null, boolean, []any, map[string]any
+// other types return null
+func toNodeValue(qv any, e RxeHandler) any {
+	switch v := qv.(type) {
+	case int64:
+		return &IntDef{Value: v}
+	case int:
+		return &IntDef{Value: int64(v)}
+	case int8:
+		return &IntDef{Value: int64(v)}
+	case int16:
+		return &IntDef{Value: int64(v)}
+	case int32:
+		return &IntDef{Value: int64(v)}
+	case uint64:
+		// if value is uint64, turn into string
+		return &StringDef{Value: strconv.FormatUint(v, 10)}
+	case uint:
+		return &IntDef{Value: int64(v)}
+	case uint8:
+		return &IntDef{Value: int64(v)}
+	case uint16:
+		return &IntDef{Value: int64(v)}
+	case uint32:
+		return &IntDef{Value: int64(v)}
+	case string:
+		return &StringDef{Value: v}
+	case bool:
+		return &BoolDef{Value: v}
+	case float64:
+		return &DoubleDef{Value: v}
+	case float32:
+		return &DoubleDef{Value: float64(v)}
+	case []any:
+		ad := &ArrayDef{Value: make([]Node, 0, 32)}
+		for i, _ := range v {
+			ad.Value = append(ad.Value, toNodeValue(v[i], e).(Node))
+		}
+		return ad
+	case map[string]any:
+		vd := &DictionaryDef{Values: make(map[string]Node, 32)}
+		for key, value := range v {
+			vd.Values[key] = toNodeValue(value, e).(Node)
+		}
+		return vd
+	}
+	return &NullDef{}
+}
+
 // NodeStringValue fetch the string value of the node in RXScript
 func NodeStringValue(astNode any, e RxeHandler) any {
 	for {
@@ -302,8 +375,6 @@ func NodeStringValue(astNode any, e RxeHandler) any {
 			return v.String()
 		case *Class:
 			return v.String()
-		//case Node:
-		//	astNode = v.Execute(e)
 		default:
 			return astNode
 		}

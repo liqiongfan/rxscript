@@ -22,7 +22,7 @@ func (x *FunctionDef) Any(handler RxeHandler) any {
 }
 
 func (x *FunctionDef) String() string {
-	return "function'" + x.Name + "'"
+	return "func(" + x.Name + ")"
 }
 
 func (x *FunctionDef) Type() CmdType {
@@ -47,18 +47,22 @@ func (x *FunctionDef) Invoke(args []any, e RxeHandler) any {
 			newArgs = append(newArgs, RawAstNode(arg, e))
 		}
 	}
+
 	args = newArgs
+	inputArgsNum := len(args)
+	methodArgsNum := len(x.Args)
 
 	hasOmitMore := false
 	for _, arg := range x.Args {
-		if arg == `...` {
+		if arg == OmitMore {
 			hasOmitMore = true
 			break
 		}
 	}
 
 	// args check
-	if (len(x.Args) > len(args) && !hasOmitMore) || (hasOmitMore && len(x.Args)-1 > len(args)) {
+	if (methodArgsNum > inputArgsNum && !hasOmitMore) ||
+		(hasOmitMore && methodArgsNum-1 > inputArgsNum) {
 		return ThrowSystemErrorWithFormat(
 			"RXScript: too few arguments for method %s, arguments need: %s",
 			x.Name,
@@ -68,13 +72,12 @@ func (x *FunctionDef) Invoke(args []any, e RxeHandler) any {
 
 	// invoke method with args
 	callArgs := NewNodeStore()
-	xArgsNum := len(x.Args)
-	for i := 0; i < xArgsNum; i++ {
+	for i := 0; i < methodArgsNum; i++ {
 		arg := x.Args[i]
-		if arg == `...` {
+		if arg == OmitMore {
 			previousArg := x.Args[i-1]
-			arrayValue := &ArrayDef{Value: make([]Node, 0, xArgsNum-i+1)}
-			for k := i - 1; k < len(args); k++ {
+			arrayValue := &ArrayDef{Value: make([]Node, 0, methodArgsNum-i+1)}
+			for k := i - 1; k <= inputArgsNum-1; k++ {
 				arrayValue.Value = append(arrayValue.Value, args[k].(Node))
 				i++
 			}

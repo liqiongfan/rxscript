@@ -21,5 +21,5 @@ func (x *NullDef) Execute(e RxeHandler) any {
 }
 
 func (x *NullDef) String() string {
-	return "'null'"
+	return "null"
 }

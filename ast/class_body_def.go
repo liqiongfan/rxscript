@@ -17,10 +17,11 @@ type ClassBodyDef struct {
 	IsPrivate bool
 	IsPublic  bool
 
-	Name  string
-	Args  []string
-	Body  *FunctionBodyDef
-	Value Node
+	Name      string
+	Args      []string
+	Body      *FunctionBodyDef
+	Value     Node
+	ClassName string
 
 	// if is object, owner will be the object of the class
 	// holds the latest class object.
@@ -33,7 +34,7 @@ func (x *ClassBodyDef) Any(handler RxeHandler) any {
 
 func (x *ClassBodyDef) String() string {
 	if x.IsMethod {
-		return "func('" + x.Name + "')"
+		return "method(" + x.Name + ")"
 	}
 	return x.Name
 }
@@ -47,6 +48,7 @@ func (x *ClassBodyDef) Execute(e RxeHandler) any {
 }
 
 func (x *ClassBodyDef) Invoke(args []any, e RxeHandler) any {
+
 	newArgs := make([]any, 0, len(args))
 	for _, arg := range args {
 		switch arg := arg.(type) {
@@ -63,7 +65,7 @@ func (x *ClassBodyDef) Invoke(args []any, e RxeHandler) any {
 
 	hasOmitMore := false
 	for _, arg := range x.Args {
-		if arg == `...` {
+		if arg == OmitMore {
 			hasOmitMore = true
 			break
 		}
@@ -81,18 +83,19 @@ func (x *ClassBodyDef) Invoke(args []any, e RxeHandler) any {
 
 	// invoke method with args
 	callArgs := NewNodeStore()
-	callArgs.Set("this", e.GetCallingObject())
+	callArgs.Set(ThisVar, e.GetCallingObject())
 	if e.GetCallingObject() == nil && x.owner != nil {
-		callArgs.Set("this", x.owner)
+		callArgs.Set(ThisVar, x.owner)
 	}
 
 	xArgsNum := len(x.Args)
+	realArgsNum := len(args)
 	for i := 0; i < xArgsNum; i++ {
 		arg := x.Args[i]
-		if arg == `...` {
+		if arg == OmitMore {
 			previousArg := x.Args[i-1]
 			arrayValue := &ArrayDef{Value: make([]Node, 0, xArgsNum-i+1)}
-			for k := i - 1; k < len(args); k++ {
+			for k := i - 1; k <= realArgsNum-1; k++ {
 				arrayValue.Value = append(arrayValue.Value, args[k].(Node))
 				i++
 			}
@@ -104,6 +107,13 @@ func (x *ClassBodyDef) Invoke(args []any, e RxeHandler) any {
 
 	e.PushArgStack(callArgs)
 
+	if x.Name == x.ClassName && x.IsMethod {
+		cd, ok := e.GetFromClassDefs(x.ClassName)
+		if ok {
+			e.PushClassDef(cd.(*ClassDef))
+		}
+	}
+
 	// invoke
 	ret := x.Body.Execute(e)
 	switch x := ret.(type) {
@@ -113,7 +123,15 @@ func (x *ClassBodyDef) Invoke(args []any, e RxeHandler) any {
 
 	switch ret.(type) {
 	case *BreakDef:
-		return ThrowSystemErrorWithFormat("RXScript: break can only be used in for statements")
+		return ThrowSystemErrorWithFormat(
+			"RXScript: break can only be used in for statements")
+	}
+
+	if x.Name == x.ClassName && x.IsMethod {
+		_, ok := e.GetFromClassDefs(x.ClassName)
+		if ok {
+			e.PopClassDef()
+		}
 	}
 
 	e.PopArgStack()

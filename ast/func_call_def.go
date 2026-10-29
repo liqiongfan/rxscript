@@ -32,7 +32,8 @@ func (x *FuncCallDef) Type() CmdType {
 }
 
 func (x *FuncCallDef) Execute(e RxeHandler) any {
-	var obj = x.Name
+	obj := x.Name
+
 	for {
 		switch node := obj.(type) {
 		case *ClassDef:
@@ -51,14 +52,15 @@ func (x *FuncCallDef) Execute(e RxeHandler) any {
 		case *SystemResource:
 			return CheckSystemError(node.Invoke(e, x.Args), e)
 		case interface {
-			WithArgs(e RxeHandler, args ...any)
+			WithArgs(nd any, e RxeHandler, args ...any)
 			Execute(RxeHandler) any
 		}:
-			node.WithArgs(e, x.Args...)
+			node.WithArgs(node, e, x.Args...)
 			return CheckSystemError(node.Execute(e), e)
 		case *GetAttributeDef:
 			obj = CheckSystemError(node.Execute(e), e)
-		case *DictionaryDef, *Class:
+		case *DictionaryDef, *Class, *ArrayDef, *TimeTimer, *TimeTicker, *ReturnDef,
+			*IntDef, *StringDef, *BoolDef, *DoubleDef, *NullDef, *ChannelDef, *WaitDef, *HttpRequest:
 			return ThrowSystemErrorWithFormat("RXScript: object(%s) is not a callable", x.Name)
 		case Node:
 			obj = CheckSystemError(node.Execute(e), e)

@@ -1,6 +1,6 @@
 //
 // The RXScript author
-// ChannelDef represent channel object
+// HttpRequest represent Go's http.Request
 
 package ast
 

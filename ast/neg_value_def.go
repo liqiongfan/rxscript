@@ -4,7 +4,7 @@
 
 package ast
 
-import "encoding/json"
+import "math/big"
 
 var _ Node = (*NegValueDef)(nil)
 
@@ -14,14 +14,6 @@ type NegValueDef struct {
 
 func (x *NegValueDef) Any(handler RxeHandler) any {
 	return CheckSystemError(x.Execute(handler), handler).(Node).Any(handler)
-}
-
-func (x *NegValueDef) MarshalJSON() ([]byte, error) {
-	buf, err := json.Marshal(x.Value)
-	if err != nil {
-		return nil, err
-	}
-	return append([]byte("-"), buf...), nil
 }
 
 func (x *NegValueDef) String() string {
@@ -39,7 +31,17 @@ func (x *NegValueDef) Execute(e RxeHandler) any {
 		return &IntDef{Value: v * -1}
 	case float64:
 		return &DoubleDef{Value: v * -1}
-	default:
-		return ThrowSystemErrorWithFormat("RXScript: unknown negative type: '%s'", v)
+	case string:
+		ab, ok := new(big.Rat).SetString(v)
+		if !ok {
+			goto err
+		}
+		r := new(big.Rat).Mul(new(big.Rat).SetInt64(-1), ab)
+		if r.IsInt() {
+			return &IntDef{Value: r.Num().Int64()}
+		}
+		return &StringDef{Value: StripTrailingZeros(r.FloatString(FloatPrecisionWidth))}
 	}
+err:
+	return ThrowSystemErrorWithFormat("RXScript: unknown negative type: '%s'", v)
 }

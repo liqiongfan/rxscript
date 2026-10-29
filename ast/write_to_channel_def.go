@@ -15,10 +15,6 @@ func (x *WriteToChannelDef) Any(handler RxeHandler) any {
 	return nil
 }
 
-func (x *WriteToChannelDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
-}
-
 func (x *WriteToChannelDef) Type() CmdType {
 	return WriteToChannelDefAstCmd
 }
@@ -35,5 +31,5 @@ func (x *WriteToChannelDef) Execute(e RxeHandler) any {
 }
 
 func (x *WriteToChannelDef) String() string {
-	return "'channel<-'"
+	return "object(channel<-)"
 }
