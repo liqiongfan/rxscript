@@ -38,6 +38,7 @@ const (
 	MinusDefAstCmd
 	MultiplyDefAstCmd
 	NeDefAstCmd
+	NotDefAstCmd
 	NegValueDefAstCmd
 	NullDefAstCmd
 	OrDefAstCmd
@@ -211,9 +212,9 @@ func RawAstNode(astNode any, e RxeHandler) any {
 			return v
 		case *ArrayDef, *DictionaryDef:
 			return v
-		case *ChannelDef, *WaitDef, *HttpRequest, *TimeTicker, *TimeTimer:
+		case *ChannelDef, *WaitDef, *HttpRequest, *OsFile, *Scanner, *TimeTicker, *TimeTimer:
 			return v
-		case *ClassBodyDef, *FunctionDef:
+		case *ClassBodyDef, *FunctionDef, *SplitArrayDef, *AtomicIntDef:
 			return v
 		case *SystemResource:
 			return v.Execute(e)
@@ -257,6 +258,10 @@ func rawValue(qv any, e RxeHandler) any {
 		case *SystemResource:
 			return v.obj.Interface()
 		case *HttpRequest:
+			return v.Value
+		case *OsFile:
+			return v.Value
+		case *Scanner:
 			return v.Value
 		case *TimeTicker:
 			return v.Value
@@ -363,6 +368,8 @@ func NodeStringValue(astNode any, e RxeHandler) any {
 			return v.String()
 		case *ReturnDef:
 			astNode = v.Value
+		case *SplitArrayDef:
+			return v.Value.String()
 		case *AtomicIntDef:
 			return v.String()
 		case *DictionaryDef:
@@ -371,10 +378,20 @@ func NodeStringValue(astNode any, e RxeHandler) any {
 			return v.String()
 		case *SystemResource:
 			return v.String()
+		case *TimeTicker:
+			return v.String()
+		case *TimeTimer:
+			return v.String()
 		case *HttpRequest:
+			return v.String()
+		case *OsFile:
+			return v.String()
+		case *Scanner:
 			return v.String()
 		case *Class:
 			return v.String()
+		case Node:
+			astNode = v.Execute(e)
 		default:
 			return astNode
 		}

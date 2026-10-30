@@ -1,20 +1,38 @@
 import std
 
 main() {
-  println("1.00005" / 2.5 + "1.0000000000250" + 1e9)
-  println(toString(0.90010) + "0.8883")
-  println(toString(0.90010) * "0.8883")
-  println(toString(0.90010) / "0.8883")
-  println("100" % "8")
-  println(0x10, toInt("0x10"))
   println(std.String("%d I Love %s").format(01010, "RXScript"))
 
+  println("1.00005" / 2.5 + "1.0000000000250" + 1e9)
 
-  v = ["1.5","1.6", "1.8", "2.11", "3.23", "4.55", "6.66"]
-  total = "0.0"
+  println(toString(0.90010) / "0.8883")
+
+  total = 0
+  v = ["1.1", "1.01", "1.001", "1.0001", "1.00001", "1.000001", "1.0000001", "1.00000001"]
   for _, val = range v {
     total +=  val
-    println(val)
   }
-  println(total)
+
+  println("total = " + total)
+
+  fw = pipe()
+  go {
+    // data = read(fw[0], 10)
+    s = std.Scanner(fw[0], "\n")
+    for {
+      if !s.next() {
+        break
+      }
+      println(s.text())
+    }
+    // println(data)
+  }
+
+  for {
+    data = std.String("%s--%d\n").format("RXScript", time().Unix())
+    if write(fw[1], data) {
+      sleep(500.)
+    }
+  }
+
 }

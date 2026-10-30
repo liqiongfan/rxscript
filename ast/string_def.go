@@ -4,10 +4,21 @@
 
 package ast
 
+import (
+	"strconv"
+)
+
 var _ Node = (*StringDef)(nil)
 
 type StringDef struct {
 	Value string
+}
+
+// NewStringDef from quoted value obtain the string
+func NewStringDef(
+	value string) *StringDef {
+	v, _ := strconv.Unquote(`"` + value + `"`)
+	return &StringDef{Value: v}
 }
 
 func (x *StringDef) Any(handler RxeHandler) any {

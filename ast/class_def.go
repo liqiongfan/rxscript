@@ -4,6 +4,8 @@
 
 package ast
 
+import "strings"
+
 var _ Node = (*ClassDef)(nil)
 
 // ClassDef Each class was a ClassDef
@@ -62,6 +64,24 @@ func (x *ClassDef) NewInstance(args []any, e RxeHandler) *Class {
 		if stmt.IsPublic && stmt.Name == x.Name {
 
 			e.SetCallingObject(ci)
+
+			hasOmitMore := false
+			for _, arg := range stmt.Args {
+				if arg == OmitMore {
+					hasOmitMore = true
+					break
+				}
+			}
+
+			//args check
+			if (len(stmt.Args) > len(args) && !hasOmitMore) || (hasOmitMore && len(stmt.Args)-1 > len(args)) {
+				CheckSystemError(ThrowSystemErrorWithFormat(
+					"RXScript: too few arguments for %s.%s, arguments need: %s",
+					x.owner.Name,
+					x.Name,
+					strings.Join(stmt.Args, ", "),
+				), e)
+			}
 
 			// call constructor function
 			// prepare calling args

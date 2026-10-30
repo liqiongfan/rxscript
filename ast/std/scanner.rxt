@@ -1,0 +1,17 @@
+class Scanner {
+  private s = null
+  public Scanner(file, splitChars)
+  {
+    this.s = newScanner(file, splitChars)
+  }
+
+  public next()
+  {
+    return scanNext(this.s)
+  }
+
+  public text()
+  {
+    return scanText(this.s)
+  }
+}

@@ -37,6 +37,11 @@ func (p *ToInt) Execute(rxe RxeHandler) any {
 			goto err
 		}
 		return &IntDef{Value: val.Int64()}
+	case *SystemResource:
+		if vv.obj.CanInt() {
+			return &IntDef{Value: vv.obj.Int()}
+		}
+		return &IntDef{Value: 0}
 	case *BoolDef:
 		if vv.Value {
 			return &IntDef{Value: 1}

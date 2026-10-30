@@ -7,7 +7,6 @@ package ast
 import (
 	"os"
 	"strconv"
-	"strings"
 )
 
 type PutFile struct {
@@ -86,15 +85,7 @@ func (p *PutFile) Execute(rxe RxeHandler) any {
 		return ThrowSystemError(err)
 	}
 
-	nf := strings.NewReplacer(
-		`\a`, "\a",
-		`\b`, "\b",
-		`\n`, "\n",
-		`\t`, "\t",
-		`\r`, "\r",
-		`\t`, "\t",
-	).Replace(fileData.(string))
-	_, err = f.Write([]byte(nf))
+	_, err = f.Write([]byte(fileData.(string)))
 	if err != nil {
 		return ThrowSystemError(err)
 	}

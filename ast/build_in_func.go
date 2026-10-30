@@ -108,6 +108,18 @@ func fetchBuildInFunc(name string) any {
 		return NewToString()
 	case `toInt`:
 		return NewToInt()
+	case `pipe`:
+		return NewPipe()
+	case `read`:
+		return NewRead()
+	case `write`:
+		return NewWrite()
+	case `newScanner`:
+		return NewBuffScanner()
+	case `scanNext`:
+		return NewScanNext()
+	case `scanText`:
+		return NewScanText()
 	default:
 		return nil
 	}

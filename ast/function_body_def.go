@@ -47,6 +47,8 @@ func (x *FunctionBodyDef) Execute(e RxeHandler) any {
 		switch ret.(type) {
 		case *BreakDef:
 			return ret
+		case *ReturnDef:
+			return ret
 		}
 	}
 

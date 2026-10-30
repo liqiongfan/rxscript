@@ -6,6 +6,7 @@ package ast
 
 import (
 	"math/big"
+	"strconv"
 )
 
 var _ Node = (*PlusDef)(nil)
@@ -65,25 +66,25 @@ func (x *PlusDef) Execute(e RxeHandler) any {
 		case int64:
 			ab, ok := new(big.Rat).SetString(a)
 			if !ok {
-				goto err
+				return &StringDef{Value: a + strconv.FormatInt(b, 10)}
 			}
 			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Add(ab,
 				new(big.Rat).SetInt64(b)).FloatString(FloatPrecisionWidth))}
 		case float64:
 			ab, ok := new(big.Rat).SetString(a)
 			if !ok {
-				goto err
+				return &StringDef{Value: a + strconv.FormatFloat(b, 'f', FloatPrecisionWidth, 64)}
 			}
 			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Add(ab,
 				new(big.Rat).SetFloat64(b)).FloatString(FloatPrecisionWidth))}
 		case string:
 			ab, ok := new(big.Rat).SetString(a)
 			if !ok {
-				goto err
+				return &StringDef{Value: a + b}
 			}
 			bb, ok := new(big.Rat).SetString(b)
 			if !ok {
-				goto err
+				return &StringDef{Value: a + b}
 			}
 			return &StringDef{Value: StripTrailingZeros(new(big.Rat).Add(ab, bb).FloatString(FloatPrecisionWidth))}
 		}

@@ -6,8 +6,9 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"rxscript/ast"
 	"time"
+
+	"github.com/liqiongfan/rxscript/ast"
 )
 
 var (
@@ -63,7 +64,7 @@ func main() {
 	flag.Parse()
 	os.Args = flag.Args()
 	if showVersion {
-		log.Fatal("RXScript version 0.5.1")
+		log.Fatal("RXScript version 0.5.2")
 	}
 	if author {
 		log.Fatal("RXScript Author: xeapplee@gmail.com(terry)")

@@ -72,17 +72,14 @@ func (e *Rxe) GetCallingObject() *Class {
 }
 
 func (e *Rxe) PushArgStack(arg NodeStore) {
-	if len(e.argsStack) == 0 {
-		e.argsStack = append(e.argsStack, e.callArgs)
-	}
-	e.argsStack = append(e.argsStack, arg)
+	e.argsStack = append(e.argsStack, e.callArgs, arg)
 	e.callArgs = arg
 }
 
 func (e *Rxe) PopArgStack() {
 	e.callingObject = nil
 	e.callArgs = e.argsStack[len(e.argsStack)-2]
-	e.argsStack = e.argsStack[:len(e.argsStack)-1]
+	e.argsStack = e.argsStack[:len(e.argsStack)-2]
 }
 
 func (e *Rxe) GetVariables() NodeStore {

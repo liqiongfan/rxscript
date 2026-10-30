@@ -1,0 +1,224 @@
+import std
+import std as lib
+
+class Base {
+  private address = "do.1.2"
+  public Base() {
+    b = 0
+    b++
+    b--
+    println(b)
+  }
+}
+
+class Animal {
+  public address = 2002
+}
+
+class Hello : Base, Animal
+{
+  public id = 0
+  public name = "hello"
+  public z = 100
+  public xz = [1,200,null,this.name,"rx", ["go", "rxengine"]]
+
+  public Hello(id, name)
+  {
+    this.id = id
+    this.name = name
+    this.address = "false--e"
+  }
+
+  public doMoney(num) {
+    println("this.xz[3]=", this.xz[3])
+    println("hello golang", num, this.xz[3], this.xz[5][0], this.name[0])
+    this.name2 = 9
+    this.name2 = this.id-=5/5
+    println("this.name2:", this.name2)
+
+    tr = getTimeResource()
+    println(tr.Format("2006-01-02 15:04:05") + " hello")
+
+    t = getTimeResource("2026-10-16 15:27:30")
+    loc = getLocation("America/Los_Angeles")
+    println(t.In(loc).Format("2006-01-02 15:04:05"))
+
+    v = listDir(".")
+    // println("listDir: ", v[0], v[1], v[2], v[3])
+    for index, va = range v {
+      if index == 1 {
+        // return va
+      } else {
+        // return va
+      }
+      println("index: " + index, "value: " + va)
+    }
+
+    for name, value = range this.xz {
+      println("name: ", name, " value: ", value)
+    }
+
+    println((this.name2 && this.id > 100) ? this.z : this.name)
+
+    if this.id < 10 {
+      println(this.name + " script is very excellent")
+    } else if this.name2 {
+      println("this.name2 running")
+    } else {
+      println("go")
+      println("script first.")
+    }
+
+    println("50" - "30")
+    println(this.getMoney()+2.58)
+    println("50" - "33")
+    println(this.id, this.name, this.address)
+    println(this.printlnGetAddress(getAddress))
+  }
+
+  public getMoney() {
+    return .05
+  }
+
+  private printlnGetAddress(p) {
+    x = p(" 100")
+    return x
+  }
+
+  public sayHello() {
+    println("hello sayHello")
+  }
+}
+
+getAddress(ver) {
+  return "hello address --- getAddress" + ver
+}
+
+class B {
+  public name = "1111"
+
+  public getName() {
+    return this.name
+  }
+
+  public showName() {
+    return this.getName
+  }
+}
+
+
+main() {
+/*
+  b = B()
+  println(b.showName()())
+  dirs = listDir("./")
+  tq = getTimeResource("2026-10-16 15:00:30")
+  loc = getLocation("Asia/Shanghai")
+  println(isInt(tq))
+  println(isFloat(tq))
+  println(isNull(tq))
+  println(isBool(tq))
+  println(isString(tq))
+  println(isArray(tq))
+  println(isDictionary(tq))
+  println(readFile("./dodo.txt"))
+  println(delFile("./dodo.txt"))
+  println(rename("./dodo.txt", "./dodo.rtxt"))
+  putFile("dodo.rtxt", "hello yes\n", "0644", true)
+*/
+  a = Hello(99, "Rxe")
+  a.doMoney(999.9)
+
+  // string arg: time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+  // int arg means second
+  // double arg means ms
+
+  // sleep("1s")
+
+  if false { println("if branch run") } else if false {
+    println("elseif run")
+    return 1
+    println("elseif new return after run")
+  } else if false {
+    println("elseif 2 run")
+  } else {
+    defer { println("after else run") }
+    println("else ")
+    return 1
+  }
+
+
+  //a = Hello(99, "Rxe")
+  b = 10
+  c = channel(2)
+  c <- 10
+  v = <- c
+  println("v=", v)
+  c <- 20
+  c <- a
+  println("wait")
+
+  wg = wait()
+
+  waitAdd(wg, 1)
+   println("waitAdd")
+
+  atomic = atomicInt(10)
+  println("atomic")
+  go {
+    println("routine 1")
+    a.address = 203
+    println("a.address=", a.address)
+    println("raw atomic: ", readAtomicInt(atomic))
+    storeAtomicInt(atomic, 110)
+    b++
+    d = <-c
+    a1 = <-c
+    a1.sayHello()
+    defer {
+      waitDone(wg)
+      println("before return, b=", b, "d=", d)
+    }
+    defer {
+      println("第二个defer")
+    }
+    println("goroutine1, b=", b)
+    println("goroutine2, d=", d)
+    println("goroutine3, atomic=", readAtomicInt(atomic))
+    println("goroutine4")
+    println("goroutine5")
+  }
+
+  waitAdd(wg, 1)
+  go {
+    a.address = 2033
+    defer { waitDone(wg) }
+    storeAtomicInt(atomic, readAtomicInt(atomic) + 10)
+    println("goroutine8")
+    println("goroutine9")
+    println("b=", b, " atomic=", readAtomicInt(atomic))
+  }
+
+  waitOk(wg)
+
+  kv = {}
+  kv.ab = 99.99
+
+  arr = [false, true, false, "ee"]
+  println(" isFunc=", isFunc(a.sayHello), " isArray=", isArray(arr))
+
+  println("a.address=", a.address, " kv.ab=", kv.ab, " isDictionary=", isDictionary(kv))
+
+  println(getAddress("v0.1.0"))
+
+  // start from 0, end with 10 ,step is 2
+  for idx, value = range series(0, 10, 2) {
+    println("idx=", idx, " value=", value)
+  }
+
+  // default range step for 1
+  for idx, value = range series(100, 120) {
+    println("idx=", idx, " value=", value)
+  }
+  return 0
+}

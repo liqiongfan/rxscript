@@ -93,6 +93,8 @@ func (p *MinusEqualDef) Execute(e RxeHandler) any {
 		default:
 			goto err
 		}
+	default:
+		goto err
 	}
 
 	switch stmt := p.A.(type) {
