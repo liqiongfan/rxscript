@@ -1,6 +1,22 @@
 import std
 
+class A {
+  public id = 999.9
+  public ok(num){
+    println(this.id, num)
+  }
+}
+
 main() {
+  a = A()
+  m = "ok"
+  invoke(a, m, 100)
+  println(obj_props(a))
+
+  for ik, name = range objMethods(a) {
+    println(ik, name)
+  }
+
   println(std.String("%d I Love %s").format(01010, "RXScript"))
 
   println("1.00005" / 2.5 + "1.0000000000250" + 1e9)
@@ -13,9 +29,16 @@ main() {
     total +=  val
   }
 
+  x = 1
+  z = "hello"
+  println("z's length=", len(z), "v's length=", len(v), "z[4]=", z[4])
+  println(z ||( x ? "Y" : "false"))
+
   println("total = " + total)
 
   fw = pipe()
+  // println(std.Scanner(1, 2))
+  // return 0
   go {
     // data = read(fw[0], 10)
     s = std.Scanner(fw[0], "\n")
@@ -34,5 +57,4 @@ main() {
       sleep(500.)
     }
   }
-
 }

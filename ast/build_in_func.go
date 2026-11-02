@@ -120,6 +120,14 @@ func fetchBuildInFunc(name string) any {
 		return NewScanNext()
 	case `scanText`:
 		return NewScanText()
+	case `len`:
+		return NewLen()
+	case `objMethods`, `obj_methods`, `objectMethods`:
+		return NewObjMethods()
+	case `objProps`, `obj_props`, `objectProps`:
+		return NewObjProps()
+	case `invoke`:
+		return NewInvoke()
 	default:
 		return nil
 	}
