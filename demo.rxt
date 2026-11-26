@@ -1,19 +1,50 @@
 import std
 
 class A {
-  public id = 999.9
+  private id = 999.9
   public ok(num){
     println(this.id, num)
   }
 }
 
 main() {
+  println(sha256(1))
+  x = 10
+  x *= 10
+  println(x %= 6)
+
+  a = A()
+  for _, name = range ["aKey", "bKey", "cKey", "dKey"] {
+    a.$name = name
+  }
+  println(obj_props(a), a.aKey)
+
+  for i = 0; i < 10; i++ {
+    println(i)
+  }
+
+  println(md5(1), md5("1"), 10.0 === "10.00", 10 % 3)
+  b = {a: 10}
+  k = "a"
+  x = [1,2,3,4]
+  x[0]=b[k]
+  b[k] = 32
+  println(x, b)
+  println(b[k])
+  http = std.Http("get", "https://www.baidu.com", null)
+  resp = http.do()
+  println(resp.headers())
+  println(resp.header("Content-Type"))
+  println(resp.headers()["Date"])
+  println(resp.data())
+  println(resp.statusCode())
+
   a = A()
   m = "ok"
-  invoke(a, m, 100)
-  println(obj_props(a))
+  invoke(a, m, 0b1010)
+  println(isObject(a), objectProps(a))
 
-  for ik, name = range objMethods(a) {
+  for ik, name = range objectMethods(a) {
     println(ik, name)
   }
 
@@ -32,7 +63,7 @@ main() {
   x = 1
   z = "hello"
   println("z's length=", len(z), "v's length=", len(v), "z[4]=", z[4])
-  println(z ||( x ? "Y" : "false"))
+  println(x ? "Y" : "false")
 
   println("total = " + total)
 
@@ -42,10 +73,10 @@ main() {
   go {
     // data = read(fw[0], 10)
     s = std.Scanner(fw[0], "\n")
-    for {
-      if !s.next() {
+    for (s.next()) {
+      /*if !s.next() {
         break
-      }
+      }*/
       println(s.text())
     }
     // println(data)

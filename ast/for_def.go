@@ -11,18 +11,14 @@ type ForDef struct {
 }
 
 func (x *ForDef) Any(handler RxeHandler) any {
-	return nil
-}
-
-func (x *ForDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
+	return `{}`
 }
 
 func (x *ForDef) String() string {
 	return "object(for)"
 }
 
-// Type ForRangeDefAstCmd
+// Type ForDefAstCmd
 func (x *ForDef) Type() CmdType {
 	return ForDefAstCmd
 }
@@ -33,6 +29,8 @@ func (x *ForDef) Execute(e RxeHandler) any {
 breakFor:
 	for {
 		switch n := x.Stmts.Execute(e).(type) {
+		case *ContinueDef:
+			continue
 		case *ReturnDef:
 			return n
 		case *BreakDef:

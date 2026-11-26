@@ -33,17 +33,21 @@ func (x *FuncCallDef) Type() CmdType {
 
 func (x *FuncCallDef) Execute(e RxeHandler) any {
 	obj := x.Name
+	defer e.ResetCalling()
 
 	for {
 		switch node := obj.(type) {
 		case *ClassDef:
+			e.ResetCalling()
 			return node.NewInstance(x.Args, e)
 		case *ClassBodyDef:
+			e.ResetCalling()
 			if node.IsMethod {
 				return CheckSystemError(node.Invoke(x.Args, e), e)
 			}
 			return ThrowSystemErrorWithFormat("RXScript: object(%s) is not a callable", x.Name)
 		case *FunctionDef:
+			e.ResetCalling()
 			return CheckSystemError(node.Invoke(x.Args, e), e)
 		case *SystemErrorDef:
 			return CheckSystemError(node.Execute(e), e)
@@ -58,14 +62,17 @@ func (x *FuncCallDef) Execute(e RxeHandler) any {
 			node.WithArgs(node, e, x.Args...)
 			return CheckSystemError(node.Execute(e), e)
 		case *GetAttributeDef:
+			e.SetCalling()
 			obj = CheckSystemError(node.Execute(e), e)
 		case *DictionaryDef, *Class, *ArrayDef, *TimeTimer, *TimeTicker, *ReturnDef,
-			*IntDef, *StringDef, *BoolDef, *DoubleDef, *NullDef, *ChannelDef, *WaitDef, *HttpRequest:
+			*IntDef, *StringDef, *BoolDef, *DoubleDef, *NullDef, *ChannelDef, *WaitDef,
+			*HttpRequest, *HttpResponseRequest:
 			return ThrowSystemErrorWithFormat("RXScript: object(%s) is not a callable", x.Name)
 		case Node:
+			e.SetCalling()
 			obj = CheckSystemError(node.Execute(e), e)
 		default:
-			panic(node)
+			panic("RXScript: Unsupported feature")
 		}
 	}
 }

@@ -2,25 +2,63 @@
 // The RXScript author
 //
 
+/**
+ * Ticker provides a repeatable interval clock signal.
+ * It delivers periodic ticks at regular time intervals, commonly used for recurring background tasks.
+ */
 class Ticker {
 
+  /**
+   * Constructor: Initializes a new ticker that delivers clock ticks at regular intervals.
+   * @param duration The time interval duration between each tick.
+   */
   public Ticker(duration) { this.t = newTicker(duration) }
 
+  /**
+   * Stops the ticker. Once stopped, no more ticks will be sent.
+   */
   public stop() { stopTicker(this.t) }
 
+  /**
+   * Resets the ticker to a new duration interval.
+   * @param duration The new time interval duration for the ticker.
+   */
   public reset(duration) { resetTicker(this.t, duration) }
 
+  /**
+   * Exposes the underlying channel or signal receiver to listen for ticks.
+   * @return The internal ticker channel or instance.
+   */
   public on() { return this.t }
 }
 
 
+/**
+ * Timer represents a single delayed event indicator.
+ * It fires once after the specified duration expires, ideal for scheduling one-off timeouts or delays.
+ */
 class Timer {
 
+  /**
+   * Constructor: Initializes a new timer that will send a single event after the specified duration.
+   * @param duration The waiting period before the timer fires.
+   */
   public Timer(duration) { this.t = newTimer(duration) }
 
+  /**
+   * Stops the timer, preventing it from firing if it hasn't expired yet.
+   */
   public stop() { stopTimer(this.t) }
 
+  /**
+   * Resets the timer to start counting down with a new duration.
+   * @param duration The new expiration duration for the timer.
+   */
   public reset(duration) { resetTimer(this.t, duration) }
 
+  /**
+   * Exposes the underlying channel or signal receiver to listen for the timer expiration.
+   * @return The internal timer channel or instance.
+   */
   public on() { return this.t }
 }

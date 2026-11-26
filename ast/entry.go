@@ -14,6 +14,11 @@ import (
 	_ "embed"
 )
 
+//go:generate goyacc -p rxe -v zlanguage.output -o rx_engine_language.go .\rx_engine_language.y
+//go:generate wsl -- re2go --no-generation-date -c rx_engine_language.re -o rx_engine_language_scanner.go
+//go:generate goyacc -p rxeJson -v zjson.output -o rx_json_yacc.go rx_json_yacc.y
+//go:generate wsl -- re2go --no-generation-date -c -o rx_json_scanner.go rx_json.re
+
 const (
 	OmitMore = `...`
 	ThisVar  = `this`
@@ -29,9 +34,9 @@ var (
 // yacc will invoke Lex method to get next token
 func (lex *RxeLexer) Lex(lval *rxeSymType) int {
 	token := getToken(lex)
-	//fmt.Printf("token: %d, %s, %v\n", token, rxeSymNames[rxeXLAT[token]], lex.value)
+	// fmt.Printf("token: %d, %s, %v\n", token, rxeSymNames[rxeXLAT[token]], lex.value)
 	switch token {
-	case INT, STRING, BOOL, DOUBLE, OMITMORE, NAME, PATH, SYSTEMPATH:
+	case INT, STRING, BOOL, ESTRING, DOUBLE, OMITMORE, NAME, PATH, SYSTEMPATH:
 		lval.val = lex.value
 	case NULL:
 		lval.val = nil
@@ -48,6 +53,7 @@ func (lex *RxeLexer) Error(s string) {
 // each script run start from here. debug mode give you more bison reduce/shift rule details
 func RunScript(scriptName string, debug, goNum int) int {
 	rxeDebug = debug
+	rxeJsonDebug = debug
 
 	if filepath.Ext(scriptName) != ScriptSuffix {
 		scriptName += ScriptSuffix
@@ -97,7 +103,7 @@ func RunScript(scriptName string, debug, goNum int) int {
 		case *ClassDef:
 			engine.classDefs[v.Name] = v
 		case *FunctionDef:
-			if v.Name != `main` {
+			if v.Name != EntryFunc {
 				engine.funcDefs[v.Name] = v
 			}
 		}
@@ -107,7 +113,7 @@ func RunScript(scriptName string, debug, goNum int) int {
 	for _, stmt := range lex.result {
 		switch v := stmt.(type) {
 		case *FunctionDef:
-			if v.Name == `main` {
+			if v.Name == EntryFunc {
 				switch ret := CheckSystemError(v.Invoke(nil, engine), engine).(type) {
 				case int:
 					return ret

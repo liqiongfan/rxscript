@@ -20,7 +20,7 @@ func (x *DivideDef) Any(handler RxeHandler) any {
 }
 
 func (x *DivideDef) String() string {
-	return "'" + x.A.String() + "/" + x.B.String() + "'"
+	return "'object(/)'"
 }
 
 func (x *DivideDef) Type() CmdType {

@@ -2,6 +2,7 @@ package ast
 
 const (
 	ScriptSuffix = ".rxt"
+	EntryFunc    = `main`
 )
 
 var (
@@ -45,13 +46,17 @@ type RxeLexer struct {
 	// token position
 	line, column int64
 
+	begin int64
+
 	// result
 	result []any
 }
 
 const (
-	yycstd     = 0
-	yycpath    = 1
-	yyccall    = 2
-	yyccomment = 3
+	yycstd            = 0
+	yycpath           = 1
+	yyccall           = 2
+	yyccomment        = 3
+	yycstring         = 4
+	yycbacktickstring = 5
 )

@@ -4,6 +4,8 @@
 
 package ast
 
+import "log"
+
 var _ Node = (*GoDef)(nil)
 
 type GoDef struct {
@@ -25,6 +27,11 @@ func (x *GoDef) Type() CmdType {
 func (x *GoDef) Execute(e RxeHandler) any {
 	e.GoroutineChan() <- struct{}{}
 	go func(ne RxeHandler) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Fatal(err)
+			}
+		}()
 		defer func() {
 			<-e.GoroutineChan()
 		}()

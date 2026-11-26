@@ -12,7 +12,7 @@ type WriteToChannelDef struct {
 }
 
 func (x *WriteToChannelDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *WriteToChannelDef) Type() CmdType {

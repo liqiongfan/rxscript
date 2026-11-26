@@ -22,9 +22,18 @@ func (p *ObjProps) Execute(rxe RxeHandler) any {
 		switch v := arg.(type) {
 		case *Class:
 			arr := &ArrayDef{}
+			isExist := make(map[string]struct{}, 32)
+			// class owner props
 			for _, vd := range v.def.Body {
 				if !vd.IsMethod && vd.IsPublic {
+					isExist[vd.Name] = struct{}{}
 					arr.Value = append(arr.Value, &StringDef{Value: vd.Name})
+				}
+			}
+			// dynamic setting props
+			for name, _ := range v.variables {
+				if _, ok := isExist[name]; !ok {
+					arr.Value = append(arr.Value, &StringDef{Value: name})
 				}
 			}
 			return arr

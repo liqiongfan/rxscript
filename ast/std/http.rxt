@@ -3,26 +3,91 @@
 // Http class, encapsulate the HTTP operate.
 //
 
+/**
+ * HttpResponse represents the network response received from an HTTP server.
+ * It encapsulates the response metadata, status code, headers, and the raw payload body data.
+ */
+class HttpResponse {
+  private response = null
+  private headersValue = null
+  private code = null
+
+  /**
+   * Constructor: Initializes a new HttpResponse wrapper instance.
+   * @param resp The raw response object returned from the underlying networking implementation.
+   */
+  public HttpResponse(resp) {
+    this.response = resp
+    this.headersValue = httpResponseHeader(resp)
+    this.code = httpResponseStatus(resp)
+  }
+
+  /**
+   * Retrieves the HTTP status code returned by the server.
+   * @return An integer representing the HTTP status (e.g., 200 for OK, 404 for Not Found).
+   */
+  public statusCode() {
+    return this.code
+  }
+
+  /**
+   * Retrieves all the HTTP response headers received from the server.
+   * @return A map or dictionary structure containing key-value header definitions.
+   */
+  public headers() {
+    return this.headersValue
+  }
+
+  /**
+   * Retrieves the value of a specific HTTP response header by its case-sensitive key field.
+   * @param key The literal name string of the target header field (e.g., "Content-Type").
+   * @return The text value associated with the specified header key, or null/undefined if it does not exist.
+   */
+  public header(key) {
+    return this.headersValue[key]
+  }
+
+  /**
+   * Retrieves the raw content or payload data from the response body.
+   * @return The response body bytes or string stream.
+   */
+  public data() {
+    return httpResponseData(this.response)
+  }
+}
+
+/**
+ * Http client wrapper providing a simplified interface for configuring
+ * and executing synchronous HTTP network requests.
+ */
 class Http {
   private req = null
 
-  // Http method
-  // method: HTTP method, such as GET, PUT, DELETE, POST, OPTIONS, and so on
-  // url: HTTP URL
-  // data: post data, if you don't post data to server, set it to null
+  /**
+   * Constructor: Initializes a new HTTP request with core transfer parameters.
+   * @param method The HTTP verb string (e.g., "GET", "POST", "PUT", "DELETE", "OPTIONS").
+   * @param url The target destination URL endpoint.
+   * @param data The payload body content for sending data; set to null if not applicable.
+   */
   public Http(method, url, data) {
     this.req = newHttp(method, url, data)
   }
 
-  // addHeader add http request headers
-  // name: string header name
-  // value: string header value
+  /**
+   * Appends or overwrites a specific HTTP request header field key-value pair.
+   * @param name The literal header name designation (e.g., "Content-Type", "Authorization").
+   * @param value The value string to assign to the specified header.
+   */
   public addHeader(name, value) {
     setHttpHeader(this.req, name, value)
   }
 
-  // do invoke an http request and get the response return.
+  /**
+   * Dispatches the configured HTTP request transaction to the server.
+   * @return The server's response instance, payload payload, or status context.
+   */
   public do() {
-    return httpDo(this.req)
+    resp = httpDo(this.req)
+    return std.HttpResponse(resp)
   }
 }

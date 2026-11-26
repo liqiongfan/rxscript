@@ -15,7 +15,7 @@ type AndDef struct {
 }
 
 func (x *AndDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *AndDef) String() string {

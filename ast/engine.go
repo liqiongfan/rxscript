@@ -32,6 +32,20 @@ type Rxe struct {
 	// current class definitions
 	currentClassDef *ClassDef
 	callingScope    []*ClassDef
+
+	needFunc bool
+}
+
+func (e *Rxe) SetCalling() {
+	e.needFunc = true
+}
+
+func (e *Rxe) Calling() bool {
+	return e.needFunc
+}
+
+func (e *Rxe) ResetCalling() {
+	e.needFunc = false
 }
 
 func (e *Rxe) GetCurrentClassDef() *ClassDef {

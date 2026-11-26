@@ -14,7 +14,7 @@ type IfStmtDef struct {
 }
 
 func (x *IfStmtDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *IfStmtDef) String() string {

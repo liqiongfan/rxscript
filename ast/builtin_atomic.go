@@ -11,7 +11,7 @@ type AtomicInt struct {
 }
 
 func (p *AtomicInt) String() string {
-	return "'atomic.int'"
+	return "'atomic(int)'"
 }
 
 func NewAtomicInt() *AtomicInt {

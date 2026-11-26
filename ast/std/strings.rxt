@@ -71,4 +71,20 @@ class String {
   public join(data) {
     return join(data, this.val)
   }
+
+  /**
+   * Converts all the characters in the current value to lowercase.
+   * @return A new string representation converted to lower case.
+   */
+  public lower() {
+    return toLower(this.val)
+  }
+
+  /**
+   * Converts all the characters in the current value to uppercase.
+   * @return A new string representation converted to upper case.
+   */
+  public upper() {
+    return toUpper(this.val)
+  }
 }

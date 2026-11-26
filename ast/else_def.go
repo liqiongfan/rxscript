@@ -11,7 +11,7 @@ type ElseDef struct {
 }
 
 func (x *ElseDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *ElseDef) String() string {

@@ -29,7 +29,7 @@ type ClassBodyDef struct {
 }
 
 func (x *ClassBodyDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *ClassBodyDef) String() string {
@@ -122,9 +122,9 @@ func (x *ClassBodyDef) Invoke(args []any, e RxeHandler) any {
 	}
 
 	switch ret.(type) {
-	case *BreakDef:
+	case *BreakDef, *ContinueDef:
 		return ThrowSystemErrorWithFormat(
-			"RXScript: break can only be used in for statements")
+			"RXScript: break or continue can only be used in for statements")
 	}
 
 	if x.Name == x.ClassName && x.IsMethod {

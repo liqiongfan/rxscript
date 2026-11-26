@@ -1,0 +1,263 @@
+state 0 //
+
+    0 $accept: . start
+
+    JSON_BOOL                 shift, and goto state 10
+    JSON_DOUBLE               shift, and goto state 11
+    JSON_INT                  shift, and goto state 9
+    JSON_LEFT_BRACE           shift, and goto state 3
+    JSON_LEFT_SQUARE_BRACKET  shift, and goto state 4
+    JSON_NULL                 shift, and goto state 7
+    JSON_STRING               shift, and goto state 8
+
+    array   goto state 6
+    object  goto state 5
+    start   goto state 1
+    value   goto state 2
+
+state 1 // JSON_BOOL [$end]
+
+    0 $accept: start .  [$end]
+
+    $end  accept
+
+state 2 // JSON_BOOL [$end]
+
+    1 start: value .  [$end]
+
+    $end  reduce using rule 1 (start)
+
+state 3 // JSON_LEFT_BRACE
+
+    2 object: JSON_LEFT_BRACE . members JSON_RIGHT_BRACE
+    3 members: .  [JSON_RIGHT_BRACE]
+
+    JSON_RIGHT_BRACE  reduce using rule 3 (members)
+    JSON_STRING       shift, and goto state 20
+
+    member   goto state 19
+    members  goto state 18
+
+state 4 // JSON_LEFT_SQUARE_BRACKET
+
+    7 array: JSON_LEFT_SQUARE_BRACKET . elements JSON_RIGHT_SQUARE_BRACKET
+    8 elements: .  [JSON_RIGHT_SQUARE_BRACKET]
+
+    JSON_BOOL                  shift, and goto state 10
+    JSON_DOUBLE                shift, and goto state 11
+    JSON_INT                   shift, and goto state 9
+    JSON_LEFT_BRACE            shift, and goto state 3
+    JSON_LEFT_SQUARE_BRACKET   shift, and goto state 4
+    JSON_NULL                  shift, and goto state 7
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 8 (elements)
+    JSON_STRING                shift, and goto state 8
+
+    array     goto state 6
+    element   goto state 13
+    elements  goto state 12
+    object    goto state 5
+    value     goto state 14
+
+state 5 // JSON_LEFT_BRACE JSON_RIGHT_BRACE [$end]
+
+   12 value: object .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 12 (value)
+    JSON_COMMA                 reduce using rule 12 (value)
+    JSON_RIGHT_BRACE           reduce using rule 12 (value)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 12 (value)
+
+state 6 // JSON_LEFT_SQUARE_BRACKET JSON_RIGHT_SQUARE_BRACKET [$end]
+
+   13 value: array .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 13 (value)
+    JSON_COMMA                 reduce using rule 13 (value)
+    JSON_RIGHT_BRACE           reduce using rule 13 (value)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 13 (value)
+
+state 7 // JSON_NULL
+
+   14 value: JSON_NULL .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 14 (value)
+    JSON_COMMA                 reduce using rule 14 (value)
+    JSON_RIGHT_BRACE           reduce using rule 14 (value)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 14 (value)
+
+state 8 // JSON_STRING
+
+   15 value: JSON_STRING .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 15 (value)
+    JSON_COMMA                 reduce using rule 15 (value)
+    JSON_RIGHT_BRACE           reduce using rule 15 (value)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 15 (value)
+
+state 9 // JSON_INT
+
+   16 value: JSON_INT .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 16 (value)
+    JSON_COMMA                 reduce using rule 16 (value)
+    JSON_RIGHT_BRACE           reduce using rule 16 (value)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 16 (value)
+
+state 10 // JSON_BOOL
+
+   17 value: JSON_BOOL .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 17 (value)
+    JSON_COMMA                 reduce using rule 17 (value)
+    JSON_RIGHT_BRACE           reduce using rule 17 (value)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 17 (value)
+
+state 11 // JSON_DOUBLE
+
+   18 value: JSON_DOUBLE .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 18 (value)
+    JSON_COMMA                 reduce using rule 18 (value)
+    JSON_RIGHT_BRACE           reduce using rule 18 (value)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 18 (value)
+
+state 12 // JSON_LEFT_SQUARE_BRACKET [JSON_RIGHT_SQUARE_BRACKET]
+
+    7 array: JSON_LEFT_SQUARE_BRACKET elements . JSON_RIGHT_SQUARE_BRACKET
+
+    JSON_RIGHT_SQUARE_BRACKET  shift, and goto state 17
+
+state 13 // JSON_LEFT_SQUARE_BRACKET JSON_BOOL [JSON_COMMA]
+
+    9 elements: element .  [JSON_RIGHT_SQUARE_BRACKET]
+   11 element: element . JSON_COMMA value
+
+    JSON_COMMA                 shift, and goto state 15
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 9 (elements)
+
+state 14 // JSON_LEFT_SQUARE_BRACKET JSON_BOOL [JSON_COMMA]
+
+   10 element: value .  [JSON_COMMA, JSON_RIGHT_SQUARE_BRACKET]
+
+    JSON_COMMA                 reduce using rule 10 (element)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 10 (element)
+
+state 15 // JSON_LEFT_SQUARE_BRACKET JSON_BOOL JSON_COMMA
+
+   11 element: element JSON_COMMA . value
+
+    JSON_BOOL                 shift, and goto state 10
+    JSON_DOUBLE               shift, and goto state 11
+    JSON_INT                  shift, and goto state 9
+    JSON_LEFT_BRACE           shift, and goto state 3
+    JSON_LEFT_SQUARE_BRACKET  shift, and goto state 4
+    JSON_NULL                 shift, and goto state 7
+    JSON_STRING               shift, and goto state 8
+
+    array   goto state 6
+    object  goto state 5
+    value   goto state 16
+
+state 16 // JSON_LEFT_SQUARE_BRACKET JSON_BOOL JSON_COMMA JSON_BOOL [JSON_COMMA]
+
+   11 element: element JSON_COMMA value .  [JSON_COMMA, JSON_RIGHT_SQUARE_BRACKET]
+
+    JSON_COMMA                 reduce using rule 11 (element)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 11 (element)
+
+state 17 // JSON_LEFT_SQUARE_BRACKET JSON_RIGHT_SQUARE_BRACKET
+
+    7 array: JSON_LEFT_SQUARE_BRACKET elements JSON_RIGHT_SQUARE_BRACKET .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 7 (array)
+    JSON_COMMA                 reduce using rule 7 (array)
+    JSON_RIGHT_BRACE           reduce using rule 7 (array)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 7 (array)
+
+state 18 // JSON_LEFT_BRACE [JSON_RIGHT_BRACE]
+
+    2 object: JSON_LEFT_BRACE members . JSON_RIGHT_BRACE
+
+    JSON_RIGHT_BRACE  shift, and goto state 27
+
+state 19 // JSON_LEFT_BRACE JSON_STRING JSON_COLON JSON_BOOL [JSON_COMMA]
+
+    4 members: member .  [JSON_RIGHT_BRACE]
+    6 member: member . JSON_COMMA JSON_STRING JSON_COLON value
+
+    JSON_COMMA        shift, and goto state 23
+    JSON_RIGHT_BRACE  reduce using rule 4 (members)
+
+state 20 // JSON_LEFT_BRACE JSON_STRING
+
+    5 member: JSON_STRING . JSON_COLON value
+
+    JSON_COLON  shift, and goto state 21
+
+state 21 // JSON_LEFT_BRACE JSON_STRING JSON_COLON
+
+    5 member: JSON_STRING JSON_COLON . value
+
+    JSON_BOOL                 shift, and goto state 10
+    JSON_DOUBLE               shift, and goto state 11
+    JSON_INT                  shift, and goto state 9
+    JSON_LEFT_BRACE           shift, and goto state 3
+    JSON_LEFT_SQUARE_BRACKET  shift, and goto state 4
+    JSON_NULL                 shift, and goto state 7
+    JSON_STRING               shift, and goto state 8
+
+    array   goto state 6
+    object  goto state 5
+    value   goto state 22
+
+state 22 // JSON_LEFT_BRACE JSON_STRING JSON_COLON JSON_BOOL [JSON_COMMA]
+
+    5 member: JSON_STRING JSON_COLON value .  [JSON_COMMA, JSON_RIGHT_BRACE]
+
+    JSON_COMMA        reduce using rule 5 (member)
+    JSON_RIGHT_BRACE  reduce using rule 5 (member)
+
+state 23 // JSON_LEFT_BRACE JSON_STRING JSON_COLON JSON_BOOL JSON_COMMA
+
+    6 member: member JSON_COMMA . JSON_STRING JSON_COLON value
+
+    JSON_STRING  shift, and goto state 24
+
+state 24 // JSON_LEFT_BRACE JSON_STRING JSON_COLON JSON_BOOL JSON_COMMA JSON_STRING
+
+    6 member: member JSON_COMMA JSON_STRING . JSON_COLON value
+
+    JSON_COLON  shift, and goto state 25
+
+state 25 // JSON_LEFT_BRACE JSON_STRING JSON_COLON JSON_BOOL JSON_COMMA JSON_STRING JSON_COLON
+
+    6 member: member JSON_COMMA JSON_STRING JSON_COLON . value
+
+    JSON_BOOL                 shift, and goto state 10
+    JSON_DOUBLE               shift, and goto state 11
+    JSON_INT                  shift, and goto state 9
+    JSON_LEFT_BRACE           shift, and goto state 3
+    JSON_LEFT_SQUARE_BRACKET  shift, and goto state 4
+    JSON_NULL                 shift, and goto state 7
+    JSON_STRING               shift, and goto state 8
+
+    array   goto state 6
+    object  goto state 5
+    value   goto state 26
+
+state 26 // JSON_LEFT_BRACE JSON_STRING JSON_COLON JSON_BOOL JSON_COMMA JSON_STRING JSON_COLON JSON_BOOL [JSON_COMMA]
+
+    6 member: member JSON_COMMA JSON_STRING JSON_COLON value .  [JSON_COMMA, JSON_RIGHT_BRACE]
+
+    JSON_COMMA        reduce using rule 6 (member)
+    JSON_RIGHT_BRACE  reduce using rule 6 (member)
+
+state 27 // JSON_LEFT_BRACE JSON_RIGHT_BRACE
+
+    2 object: JSON_LEFT_BRACE members JSON_RIGHT_BRACE .  [$end, JSON_COMMA, JSON_RIGHT_BRACE, JSON_RIGHT_SQUARE_BRACKET]
+
+    $end                       reduce using rule 2 (object)
+    JSON_COMMA                 reduce using rule 2 (object)
+    JSON_RIGHT_BRACE           reduce using rule 2 (object)
+    JSON_RIGHT_SQUARE_BRACKET  reduce using rule 2 (object)
+

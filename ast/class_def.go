@@ -17,7 +17,7 @@ type ClassDef struct {
 }
 
 func (x *ClassDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *ClassDef) Type() CmdType {

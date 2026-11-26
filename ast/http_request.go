@@ -27,5 +27,5 @@ func (x *HttpRequest) Execute(e RxeHandler) any {
 }
 
 func (x *HttpRequest) String() string {
-	return "'http.request'"
+	return "'http(request)'"
 }

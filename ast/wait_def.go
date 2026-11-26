@@ -13,11 +13,7 @@ type WaitDef struct {
 }
 
 func (x *WaitDef) Any(handler RxeHandler) any {
-	return nil
-}
-
-func (x *WaitDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
+	return `{}`
 }
 
 func (x *WaitDef) Type() CmdType {

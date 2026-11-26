@@ -11,6 +11,10 @@ import (
 	"github.com/liqiongfan/rxscript/ast"
 )
 
+const (
+	version = `0.5.5`
+)
+
 var (
 	goNum                int
 	debug                int
@@ -62,13 +66,24 @@ func init() {
 
 func main() {
 	flag.Parse()
+
 	os.Args = flag.Args()
+
+	defer func() {
+		if err := recover(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	if showVersion {
-		log.Fatal("RXScript version 0.5.2")
+		log.Fatalf("RXScript version v%s, named after my daughter", version)
 	}
+
 	if author {
-		log.Fatal("RXScript Author: xeapplee@gmail.com(terry)")
+		log.Println("RXScript author: xeapplee@gmail.com (terry)")
+		log.Fatal("website: github.com/liqiongfan")
 	}
+
 	if len(os.Args) < 1 {
 		log.Fatal("No RXScript file specified")
 	}

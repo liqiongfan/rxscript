@@ -21,7 +21,9 @@ const (
 	ClassBodyDefAstCmd
 	ClassDefAstCmd
 	DivideDefAstCmd
+	DivideEqualDefAstCmd
 	ModDefAstCmd
+	ModEqualDefAstCmd
 	DoubleDefAstCmd
 	ElseDefAstCmd
 	ElseIfDefAstCmd
@@ -37,6 +39,7 @@ const (
 	LteDefAstCmd
 	MinusDefAstCmd
 	MultiplyDefAstCmd
+	MultiplyEqualDefAstCmd
 	NeDefAstCmd
 	NotDefAstCmd
 	NegValueDefAstCmd
@@ -66,13 +69,18 @@ const (
 	WaitDefAstCmd
 	AtomicDefAstCmd
 	BreakDefAstCmd
+	ContinueDefAstCmd
 	ForDefAstCmd
+	ForNormalDefAstCmd
+	ForCondDefAstCmd
 	SplitArrayDefAstCmd
 	LeftShiftDefAstCmd
 	RightShiftDefAstCmd
 	BitAndDefAstCmd
 	BitOrDefAstCmd
+	BitNotDefAstCmd
 	BitExpDefAstCmd
+	DictionaryIndexDefAstCmd
 	GoSystemResourceDefAstCmd
 )
 
@@ -124,6 +132,9 @@ type RxeHandler interface {
 	SetCurrentClassDef(*ClassDef)
 	PushClassDef(def *ClassDef)
 	PopClassDef() *ClassDef
+	SetCalling()
+	ResetCalling()
+	Calling() bool
 }
 
 type Node interface {
@@ -212,7 +223,7 @@ func RawAstNode(astNode any, e RxeHandler) any {
 			return v
 		case *ArrayDef, *DictionaryDef:
 			return v
-		case *ChannelDef, *WaitDef, *HttpRequest, *OsFile, *Scanner, *TimeTicker, *TimeTimer:
+		case *ChannelDef, *WaitDef, *HttpRequest, *HttpResponseRequest, *OsFile, *Scanner, *TimeTicker, *TimeTimer:
 			return v
 		case *ClassBodyDef, *FunctionDef, *SplitArrayDef, *AtomicIntDef:
 			return v
@@ -223,7 +234,7 @@ func RawAstNode(astNode any, e RxeHandler) any {
 		case Node:
 			astNode = v.Execute(e)
 		default:
-			panic(fmt.Sprintf("unknown type %T", astNode))
+			panic("RXScript: Unsupported feature")
 		}
 	}
 }
@@ -258,6 +269,8 @@ func rawValue(qv any, e RxeHandler) any {
 		case *SystemResource:
 			return v.obj.Interface()
 		case *HttpRequest:
+			return v.Value
+		case *HttpResponseRequest:
 			return v.Value
 		case *OsFile:
 			return v.Value
@@ -383,6 +396,8 @@ func NodeStringValue(astNode any, e RxeHandler) any {
 		case *TimeTimer:
 			return v.String()
 		case *HttpRequest:
+			return v.String()
+		case *HttpResponseRequest:
 			return v.String()
 		case *OsFile:
 			return v.String()

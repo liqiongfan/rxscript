@@ -10,7 +10,7 @@ type BreakDef struct {
 }
 
 func (x *BreakDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *BreakDef) Type() CmdType {

@@ -4,11 +4,13 @@
 
 package ast
 
+import "fmt"
+
 var _ Node = (*GetAttributeDef)(nil)
 
 type GetAttributeDef struct {
 	Object    Node
-	Attribute string
+	Attribute Node
 }
 
 func (x *GetAttributeDef) Any(handler RxeHandler) any {
@@ -16,7 +18,7 @@ func (x *GetAttributeDef) Any(handler RxeHandler) any {
 }
 
 func (x *GetAttributeDef) String() string {
-	return x.Object.String() + "." + x.Attribute
+	return x.Object.String() + "." + x.Attribute.String()
 }
 
 func (x *GetAttributeDef) Type() CmdType {
@@ -25,14 +27,16 @@ func (x *GetAttributeDef) Type() CmdType {
 
 func (x *GetAttributeDef) Execute(e RxeHandler) any {
 
-	var obj = CheckSystemError(x.Object.Execute(e), e)
+	obj := CheckSystemError(x.Object.Execute(e), e)
+	attr := CheckSystemError(rawValue(x.Attribute.Execute(e), e), e)
+	attrName := fmt.Sprintf(`%v`, attr)
 
 	switch obj := obj.(type) {
 	case *Class:
 		e.SetCallingObject(obj)
 
 		// fetch from class object.
-		ret, isPublic, isDynamic := fetchFromClassInstance(e, obj, x.Attribute)
+		ret, isPublic, isDynamic := fetchFromClassInstance(e, obj, attrName)
 
 		// check return value throw error.
 		ret = CheckSystemError(ret, e)
@@ -51,14 +55,14 @@ func (x *GetAttributeDef) Execute(e RxeHandler) any {
 			(currentClassDef != nil && obj.Name != currentClassDef.Name) {
 			var isDefined = false
 			for _, defineOk := range currentClassDef.Body {
-				if defineOk.Name == x.Attribute {
+				if defineOk.Name == attrName {
 					isDefined = true
 				}
 			}
 			if !isDefined {
 				return ThrowSystemErrorWithFormat(
 					"RXScript: attribute '%s' not defined in class '%s'",
-					x.Attribute,
+					attrName,
 					currentClassDef.Name,
 				)
 			}
@@ -73,24 +77,37 @@ func (x *GetAttributeDef) Execute(e RxeHandler) any {
 		}
 
 		// otherwise return error.
-		return ThrowSystemErrorWithFormat("RXScript: '%s.%s' is private, can't access out of class", obj.Name, x.Attribute)
+		return ThrowSystemErrorWithFormat("RXScript: '%s.%s' is private, can't access out of class", obj.Name, attrName)
 	case *ClassDef:
-		v, _ := fetchFromClassDef(e, obj, x.Attribute)
+		v, _ := fetchFromClassDef(e, obj, attrName)
 		return v
 	case *Package:
-		return fetchFromPackage(obj, x.Attribute)
+		return fetchFromPackage(obj, attrName)
 	case *SystemResource:
-		return &SystemResource{obj: obj.obj.MethodByName(x.Attribute)}
+		m := obj.obj.MethodByName(attrName)
+		if m.IsValid() {
+			return &SystemResource{obj: obj.obj.MethodByName(attrName)}
+		}
+
+		fd := obj.obj.FieldByName(attrName)
+		if fd.IsValid() {
+			return obj.toNode(fd, e)
+		}
+		return ThrowSystemErrorWithFormat(
+			"RXScript: the attribute '%s' is not defined in '%s'",
+			attrName,
+			x.Object,
+		)
 	case *DictionaryDef:
-		if v, ok := obj.Values[x.Attribute]; ok {
+		if v, ok := obj.Values[attrName]; ok {
 			return v
 		}
-		obj.Values[x.Attribute] = &DictionaryDef{Values: map[string]Node{}}
-		return obj.Values[x.Attribute]
+		obj.Values[attrName] = &DictionaryDef{Values: map[string]Node{}}
+		return obj.Values[attrName]
 	default:
 		return ThrowSystemErrorWithFormat(
 			"RXScript: the attribute '%s' is not defined in '%s'",
-			x.Attribute,
+			attrName,
 			x.Object,
 		)
 	}

@@ -5,6 +5,7 @@
 package ast
 
 import (
+	"fmt"
 	"math/big"
 	"strconv"
 )
@@ -106,13 +107,31 @@ variableSet:
 	switch stmt := p.A.(type) {
 	case *GetAttributeDef:
 		obj := CheckSystemError(stmt.Object.Execute(e), e)
+		attr := CheckSystemError(rawValue(stmt.Attribute.Execute(e), e), e)
+		attrName := fmt.Sprintf(`%v`, attr)
 		switch obj := obj.(type) {
 		case *Class:
-			obj.variables[stmt.Attribute] = ret
+			obj.variables[attrName] = ret
 			return ret
 		case *DictionaryDef:
-			obj.Values[stmt.Attribute] = ret
+			obj.Values[attrName] = ret
 			return ret
+		case *ArrayIndexDef:
+			v := obj.Value.Execute(e)
+			switch vv := v.(type) {
+			case *ArrayDef:
+				v := vv.Execute(e)
+				if v == nil {
+					return ThrowSystemError("RXScript: null value can't be indexed")
+				}
+				if obj.Index >= int64(len(v.(*ArrayDef).Value)) {
+					return ThrowSystemErrorWithFormat("RXScript: index out of range, index: %d, total: %d", obj.Index, len(v.([]Node)))
+				}
+				v.(*ArrayDef).Value[obj.Index] = ret
+				return ret
+			default:
+				return ThrowSystemErrorWithFormat("RXScript: value of '%v' can't be indexed", rawValue(vv, e))
+			}
 		default:
 			return ThrowSystemErrorWithFormat("RXScript: cannot found object with name: '%s'", stmt.Object)
 		}

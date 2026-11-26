@@ -105,9 +105,16 @@ func fetchFromClassInstance(e RxeHandler, ci *Class, name string) (
 	any, bool /*isPublic*/, bool /* is dynamic*/) {
 	if v, ok := ci.GetVariables(name); ok {
 		// GetVariables is public or dynamic set
+		if e.Calling() {
+			switch v.(type) {
+			case *ClassBodyDef, *FunctionBodyDef:
+			default:
+				goto findMethod
+			}
+		}
 		return v, true, true
 	}
-
+findMethod:
 	// method or attribute from object instance
 	ma := ci.GetClassBodyDefByName(e, name)
 	if ma != nil {

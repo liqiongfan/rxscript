@@ -1,0 +1,24 @@
+main() {
+  a = 10
+  b = a++ // b = 10, a = 11
+  c = a-- // c = 11, a = 10
+  b = 2
+  println(a, c, -(a*b+3), ~10, -a*b+3, a & ~b)
+
+  // v = jsonDecode("{\"a\":3, \"v\":{\"key\":true}, \"data\":[true, false, null, 1, \"RXScript\"]}")
+  v = jsonDecode(`{
+      "a": 3,
+      "v": { "key": true },
+      "data": [true, false, null, 1, "RXScript"]
+    }`)
+  v["a"] = 38
+  println(v, v.a, v["v"]["key"])
+  println(v.data[4])
+
+  println(jsonEncode(null))
+  println(jsonEncode({a: null, b: b, v: v}))
+
+  println(jsonDecode(`{"name": "\u4e2d\u6587"}`))
+
+  // generateRSAKey(2048, "./pub.pem", "./private.pem")
+}

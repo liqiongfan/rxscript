@@ -2,20 +2,19 @@
 // The RXScript author
 //
 
-import std 
+import std
 
 main() {
   wg = std.WaitGroup()
 
   wg.add(1)
-
   go {
     defer { wg.done() }
     num = 0
-    for {
-      if num >= 10 {
+    for (num < 10) {
+      /*if num >= 10 {
         break
-      }
+      }*/
       num++
       println("goroutine 1")
       sleep(500.0)

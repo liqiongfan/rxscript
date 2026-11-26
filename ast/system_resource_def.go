@@ -22,6 +22,30 @@ func (s *SystemResource) String() string {
 	return "object(Res)"
 }
 
+func (s *SystemResource) toNode(v reflect.Value, e RxeHandler) Node {
+	if !v.IsValid() || v.IsZero() || (v.Kind() == reflect.Pointer && v.IsNil()) {
+		return &NullDef{}
+	}
+	switch v.Kind() {
+	case reflect.Bool:
+		return &BoolDef{Value: v.Bool()}
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return &IntDef{Value: v.Int()}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return &IntDef{Value: int64(v.Uint())}
+	case reflect.String:
+		return &StringDef{Value: v.String()}
+	case reflect.Float32, reflect.Float64:
+		return &DoubleDef{Value: v.Float()}
+	case reflect.Map:
+		return toNodeValue(v.Interface(), e).(Node)
+	case reflect.Slice:
+		return toNodeValue(v.Interface(), e).(Node)
+	default:
+		return &SystemResource{obj: v}
+	}
+}
+
 func (s *SystemResource) Execute(handler RxeHandler) any {
 	return s.obj.Interface()
 }
@@ -39,24 +63,7 @@ func (s *SystemResource) Invoke(e RxeHandler, args []any) any {
 			values = append(values, &NullDef{})
 			continue
 		}
-		switch v.Kind() {
-		case reflect.Bool:
-			values = append(values, &BoolDef{Value: v.Bool()})
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			values = append(values, &IntDef{Value: v.Int()})
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			values = append(values, &IntDef{Value: int64(v.Uint())})
-		case reflect.String:
-			values = append(values, &StringDef{Value: v.String()})
-		case reflect.Float32, reflect.Float64:
-			values = append(values, &DoubleDef{Value: v.Float()})
-		case reflect.Map:
-			values = append(values, toNodeValue(v.Interface(), e).(Node))
-		case reflect.Slice:
-			values = append(values, toNodeValue(v.Interface(), e).(Node))
-		default:
-			values = append(values, &SystemResource{obj: v})
-		}
+		values = append(values, s.toNode(v, e))
 	}
 
 	if len(values) == 1 {

@@ -1,6 +1,6 @@
 //
 // The RXScript author
-// Scanner represent Go's http.Request
+// Scanner represent Go's bufio.Scanner
 
 package ast
 

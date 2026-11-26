@@ -1,6 +1,6 @@
 //
 // The RXScript author
-// DivideDef represent /
+// DivideDef represent %
 
 package ast
 

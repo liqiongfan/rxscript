@@ -14,7 +14,7 @@ type ForRangeDef struct {
 }
 
 func (x *ForRangeDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *ForRangeDef) String() string {
@@ -45,6 +45,8 @@ func (x *ForRangeDef) Execute(e RxeHandler) any {
 			switch n := x.Stmts.Execute(e).(type) {
 			case *ReturnDef:
 				return n
+			case *ContinueDef:
+				continue
 			case *BreakDef:
 				break breakDictFor
 			}
@@ -57,6 +59,8 @@ func (x *ForRangeDef) Execute(e RxeHandler) any {
 			switch n := x.Stmts.Execute(e).(type) {
 			case *ReturnDef:
 				return n
+			case *ContinueDef:
+				continue
 			case *BreakDef:
 				break breakArrayDefFor
 			}
@@ -69,6 +73,8 @@ func (x *ForRangeDef) Execute(e RxeHandler) any {
 			switch n := x.Stmts.Execute(e).(type) {
 			case *ReturnDef:
 				return n
+			case *ContinueDef:
+				continue
 			case *BreakDef:
 				break breakStringDefFor
 			}
@@ -81,6 +87,8 @@ func (x *ForRangeDef) Execute(e RxeHandler) any {
 			switch n := x.Stmts.Execute(e).(type) {
 			case *ReturnDef:
 				return n
+			case *ContinueDef:
+				continue
 			case *BreakDef:
 				break breakClassFor
 			}

@@ -36,10 +36,10 @@ func (x *DictionaryDef) Execute(e RxeHandler) any {
 func (x *DictionaryDef) String() string {
 	r := "dict{"
 	for k, v := range x.Values {
-		r += fmt.Sprintf(`"%s": %s,`, k, v)
+		r += fmt.Sprintf(`"%s": %s, `, k, v)
 	}
 	if len(x.Values) > 0 {
-		return r[0:len(r)-1] + "}"
+		return r[0:len(r)-2] + "}"
 	}
 	return r + "}"
 }

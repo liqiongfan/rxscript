@@ -30,10 +30,6 @@ func (x *ArrayIndexDef) Any(handler RxeHandler) any {
 	return nodes[x.Index].Any(handler)
 }
 
-func (x *ArrayIndexDef) MarshalJSON() ([]byte, error) {
-	return nil, nil
-}
-
 func (x *ArrayIndexDef) String() string {
 	return fmt.Sprintf(`'%s[%d]'`, x.Value.String(), x.Index)
 }

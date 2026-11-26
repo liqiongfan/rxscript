@@ -128,6 +128,26 @@ func fetchBuildInFunc(name string) any {
 		return NewObjProps()
 	case `invoke`:
 		return NewInvoke()
+	case `toUpper`:
+		return NewToUpper()
+	case `toLower`:
+		return NewToLower()
+	case `httpResponseStatus`:
+		return NewHttpResponseStatus()
+	case `httpResponseHeader`:
+		return NewHttpResponseHeader()
+	case `httpResponseData`:
+		return NewHttpResponseData()
+	case `md5`:
+		return NewMd5()
+	case `sha256`:
+		return NewSha256()
+	case `jsonDecode`:
+		return NewJsonDecode()
+	case `jsonEncode`:
+		return NewJsonEncode()
+	case `generateRSAKey`:
+		return NewGenerateRSAKey()
 	default:
 		return nil
 	}

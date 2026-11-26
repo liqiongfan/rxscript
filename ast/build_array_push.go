@@ -29,9 +29,8 @@ func (p *ArrayPush) Execute(rxe RxeHandler) any {
 		for _, value := range values {
 			av.Value = append(av.Value, value.(Node))
 		}
+		return &BoolDef{Value: true}
 	default:
 		return ThrowSystemErrorWithFormat("RXScript: arrayPush first argument must be an array, not '%s'", av)
 	}
-
-	return &NullDef{}
 }

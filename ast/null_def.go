@@ -9,6 +9,7 @@ var _ Node = (*NullDef)(nil)
 type NullDef struct{}
 
 func (x *NullDef) Any(handler RxeHandler) any {
+	// return nil, json encode transfer to null
 	return nil
 }
 

@@ -18,7 +18,7 @@ type FunctionDef struct {
 }
 
 func (x *FunctionDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *FunctionDef) String() string {
@@ -97,8 +97,8 @@ func (x *FunctionDef) Invoke(args []any, e RxeHandler) any {
 	}
 
 	switch ret.(type) {
-	case *BreakDef:
-		return ThrowSystemErrorWithFormat("RXScript: break can only be used in for statements")
+	case *BreakDef, *ContinueDef:
+		return ThrowSystemErrorWithFormat("RXScript: break or continue can only be used in for statements")
 	}
 
 	// pop arg stack

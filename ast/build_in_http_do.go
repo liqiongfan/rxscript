@@ -5,7 +5,6 @@
 package ast
 
 import (
-	"io"
 	"net/http"
 )
 
@@ -30,12 +29,13 @@ func (p *HttpDoFunc) Execute(rxe RxeHandler) any {
 			if err != nil {
 				return ThrowSystemError(err)
 			}
-			defer reply.Body.Close()
-			response, err := io.ReadAll(reply.Body)
-			if err != nil {
-				return ThrowSystemError(err)
-			}
-			return &StringDef{Value: string(response)}
+			return &HttpResponseRequest{Value: reply}
+			//defer reply.Body.Close()
+			//response, err := io.ReadAll(reply.Body)
+			//if err != nil {
+			//	return ThrowSystemError(err)
+			//}
+			//return &StringDef{Value: string(response)}
 		default:
 			return ThrowSystemErrorWithFormat("RXScript: method need httpRequest, not '%s'", hr)
 		}

@@ -1,6 +1,6 @@
 //
 // The RXScript author
-// TriEqualDef represent += in math.
+// TriEqualDef represent ===
 
 package ast
 

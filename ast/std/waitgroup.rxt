@@ -2,21 +2,41 @@
 // The RXScript author
 // WaitGroup class, defines the goroutine batch operation.
 
+/**
+ * WaitGroup waits for a collection of concurrent tasks (goroutines) to finish.
+ * The main thread calls add to set the number of tasks to wait for.
+ * Each task runs and calls done when finished. At the same time, wait can
+ * be used to block until all tasks have completed.
+ */
 class WaitGroup {
   private wg = null
 
+ /**
+   * Constructor: Initializes a new WaitGroup instance.
+   */
   public WaitGroup() {
     this.wg = wait()
   }
 
+  /**
+   * Adds a delta value, which may be negative, to the WaitGroup counter.
+   * @param delta The integer value to change the internal task counter by.
+   */
   public add(delta) {
     waitAdd(this.wg, delta)
   }
 
+  /**
+   * Decrements the WaitGroup counter by one.
+   * This should be called when a concurrent task completes its execution.
+   */
   public done() {
     waitDone(this.wg)
   }
 
+  /**
+   * Blocks the current execution context until the WaitGroup counter reaches zero.
+   */
   public wait() {
     waitOk(this.wg)
   }

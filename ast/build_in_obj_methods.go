@@ -23,7 +23,7 @@ func (p *ObjMethods) Execute(rxe RxeHandler) any {
 		case *Class:
 			arr := &ArrayDef{}
 			for _, vd := range v.def.Body {
-				if vd.IsMethod && vd.IsPublic {
+				if vd.IsMethod && vd.IsPublic && v.Name != vd.Name {
 					arr.Value = append(arr.Value, &StringDef{Value: vd.Name})
 				}
 			}

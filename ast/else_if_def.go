@@ -12,7 +12,7 @@ type ElseIfDef struct {
 }
 
 func (x *ElseIfDef) Any(handler RxeHandler) any {
-	return nil
+	return `{}`
 }
 
 func (x *ElseIfDef) String() string {

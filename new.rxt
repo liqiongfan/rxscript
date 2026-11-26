@@ -6,7 +6,6 @@ class Base {
   public Base() {
     b = 0
     b++
-    b--
     println(b)
   }
 }
@@ -24,6 +23,7 @@ class Hello : Base, Animal
 
   public Hello(id, name)
   {
+    this.Base()
     this.id = id
     this.name = name
     this.address = "false--e"
@@ -108,6 +108,7 @@ class B {
 
 
 main() {
+  println(series(0, 100, 6))
 /*
   b = B()
   println(b.showName()())
@@ -144,9 +145,7 @@ main() {
   } else {
     defer { println("after else run") }
     println("else ")
-    return 1
   }
-
 
   //a = Hello(99, "Rxe")
   b = 10
@@ -211,7 +210,7 @@ main() {
 
   println(getAddress("v0.1.0"))
 
-  // start from 0, end with 10 ,step is 2
+  // start from 0, end with 10 ,each step is 2
   for idx, value = range series(0, 10, 2) {
     println("idx=", idx, " value=", value)
   }

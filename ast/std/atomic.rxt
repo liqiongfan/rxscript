@@ -5,14 +5,26 @@
 class Atomic {
   private val = null
 
+  /**
+   * Constructor: Initializes the atomic object with a baseline value.
+   * @param value The initial integer value to be converted into an atomic type.
+   */
   public Atomic(value) {
     this.val = atomicInt(value)
   }
 
+  /**
+   * Atomically stores the given value.
+   * @param v The new integer value to safely write into the atomic variable.
+   */
   public store(v) {
     storeAtomicInt(this.val, v)
   }
 
+  /**
+   * Atomically loads and retrieves the current value.
+   * @return The currently stored atomic integer value.
+   */
   public load() {
     return readAtomicInt(this.val)
   }

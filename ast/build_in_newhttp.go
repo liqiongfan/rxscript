@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 type HttpRequestFunc struct {
@@ -45,13 +46,13 @@ func (p *HttpRequestFunc) Execute(rxe RxeHandler) any {
 					}
 				}
 				if len(buff) > 0 {
-					source, err := http.NewRequest(method.Value, url.Value, bytes.NewBuffer(buff))
+					source, err := http.NewRequest(strings.ToUpper(method.Value), url.Value, bytes.NewBuffer(buff))
 					if err != nil {
 						return ThrowSystemError(err)
 					}
 					return &HttpRequest{Value: source}
 				}
-				source, err := http.NewRequest(method.Value, url.Value, nil)
+				source, err := http.NewRequest(strings.ToUpper(method.Value), url.Value, nil)
 				if err != nil {
 					return ThrowSystemError(err)
 				}

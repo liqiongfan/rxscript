@@ -12,10 +12,6 @@ func (p *IsInt) String() string {
 	return "'isInt'"
 }
 
-func (p *IsInt) MarshalJSON() ([]byte, error) {
-	return nil, nil
-}
-
 func NewIsInt() *IsInt {
 	return &IsInt{}
 }

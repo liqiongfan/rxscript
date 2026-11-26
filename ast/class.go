@@ -45,8 +45,26 @@ func (x *Class) GetClassBodyDefByName(e RxeHandler, name string) *ClassBodyDef {
 
 	if currentClassDef != nil && currentClassDef.Name != x.def.Name {
 		// fetch from get current class def
+		if e.Calling() {
+			for _, stmt := range currentClassDef.Body {
+				if stmt.IsMethod && stmt.Name == name {
+					return stmt
+				}
+			}
+		}
+
+		// fetch from get current class def
 		for _, stmt := range currentClassDef.Body {
 			if stmt.Name == name {
+				return stmt
+			}
+		}
+	}
+
+	// fetch from the current class
+	if e.Calling() {
+		for _, stmt := range x.def.Body {
+			if stmt.IsMethod && stmt.Name == name {
 				return stmt
 			}
 		}
