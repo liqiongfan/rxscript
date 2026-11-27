@@ -12,21 +12,21 @@ main() {
 
 ## 安装 RXScript
 
-- 已安装 `Go` 1.18以及以上版本的可以运行如下命令直接安装:
+- 已安装 `Go` 1.22以及以上版本的可以运行如下命令直接安装:
 ```shell
 go install github.com/liqiongfan/rxscript@latest
 ```
 
-- 没有安装 `Go` 1.18以及以上版本的直接下载二进制包或者编译安装
+- 没有安装 `Go` 1.22以及以上版本的直接下载二进制包或者编译安装
 
 ```shell
 go install .
 ```
 
 - [rxscript-linux-amd64](rxscript-linux-amd64) 是linux平台的二进制可执行文件
-- [rxscript-mac-arm64](rxscript-mac-arm64) 是macOS的arm64平台二进制可执行文件
-- [rxscript-mac-amd64](rxscript-mac-amd64) 是 macOS的amd64平台可执行文件
-- [rxscript.exe](rxscript.exe) 是Windows平台的二进制可执行文件
+- [rxscript-macos-arm64](rxscript-macos-arm64) 是macOS的arm64平台二进制可执行文件
+- [rxscript-macos-amd64](rxscript-macos-amd64) 是 macOS的amd64平台可执行文件
+- [rxscript-windows-amd64.exe](rxscript-windows-amd64.exe) 是Windows平台的二进制可执行文件
 
 - 验证是否安装成功
 

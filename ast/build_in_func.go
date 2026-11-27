@@ -10,6 +10,8 @@ func fetchBuildInFunc(name string) any {
 	switch name {
 	case `println`:
 		return NewPrintln()
+	case `dump`:
+		return NewDump()
 	case `listDir`:
 		return NewListDir()
 	case `getTimeResource`, `time`:

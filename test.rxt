@@ -1,6 +1,7 @@
 import std
 
 rootResponse(w, r) {
+  dump(r, w)
   write(w, "hello world")
 }
 
@@ -23,13 +24,13 @@ home(w, r) {
 
 
 main() {
-  // println(runtimeVersion())
+  println(runtimeVersion())
 
   p = HttpPath()
 
   server = std.HttpServer()
   server.handleFunc("GET /static/", httpStripPrefix("/static/", httpFileServer(".")))
-  server.handleFunc("GET /{$}", home)
+  server.handleFunc("GET /{$}", rootResponse)
   server.handleFunc("GET /hello", p.hello)
   server.run(":8081")
   // server.runWithTLS(":8081", "./cert.pem", "./key.pem")
