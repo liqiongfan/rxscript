@@ -62,6 +62,7 @@ func (p *Invoke) Execute(rxe RxeHandler) any {
 				// call
 				switch cb := ret.(type) {
 				case *ClassBodyDef:
+					rxe.SetCallingObject(cb.owner)
 					return cb.Invoke(args, rxe)
 				default:
 					return ThrowSystemErrorWithFormat("RXScript: invoke need callable, not '%s'", cb)

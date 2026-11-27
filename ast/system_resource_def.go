@@ -47,7 +47,7 @@ func (s *SystemResource) toNode(v reflect.Value, e RxeHandler) Node {
 }
 
 func (s *SystemResource) Execute(handler RxeHandler) any {
-	return s.obj.Interface()
+	return s
 }
 
 func (s *SystemResource) Invoke(e RxeHandler, args []any) any {

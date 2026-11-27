@@ -42,6 +42,7 @@ func (x *FuncCallDef) Execute(e RxeHandler) any {
 			return node.NewInstance(x.Args, e)
 		case *ClassBodyDef:
 			e.ResetCalling()
+			e.SetCallingObject(node.owner)
 			if node.IsMethod {
 				return CheckSystemError(node.Invoke(x.Args, e), e)
 			}

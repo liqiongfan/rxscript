@@ -6,6 +6,7 @@ package ast
 
 import (
 	"math/big"
+	"reflect"
 )
 
 type ToInt struct {
@@ -40,6 +41,15 @@ func (p *ToInt) Execute(rxe RxeHandler) any {
 	case *SystemResource:
 		if vv.obj.CanInt() {
 			return &IntDef{Value: vv.obj.Int()}
+		}
+		return &IntDef{Value: 0}
+	case *GoResource:
+		v := reflect.ValueOf(vv.obj)
+		if v.CanInt() {
+			return &IntDef{Value: v.Int()}
+		}
+		if v.CanUint() {
+			return &IntDef{Value: int64(v.Uint())}
 		}
 		return &IntDef{Value: 0}
 	case *BoolDef:

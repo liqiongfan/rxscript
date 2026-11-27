@@ -1,16 +1,51 @@
+import std
+
+rootResponse(w, r) {
+  write(w, "hello world")
+}
+
+class HttpPath {
+  private id = 199
+  public root(w, r){
+    req = std.HttpRequest(r)
+    println(req.info(), req.requestURL(), req.header())
+    write(w, "hello HttpPath root" + this.id)
+  }
+  public hello(w, r) {
+    writeHttpResponseCode(w, 404)
+    write(w, "HttpPath hello")
+  }
+}
+
+home(w, r) {
+  write(w, "Welcome to RXScript world")
+}
+
+
 main() {
+  // println(runtimeVersion())
+
+  p = HttpPath()
+
+  server = std.HttpServer()
+  server.handleFunc("GET /static/", httpStripPrefix("/static/", httpFileServer(".")))
+  server.handleFunc("GET /{$}", home)
+  server.handleFunc("GET /hello", p.hello)
+  server.run(":8081")
+  // server.runWithTLS(":8081", "./cert.pem", "./key.pem")
+
   a = 10
   b = a++ // b = 10, a = 11
   c = a-- // c = 11, a = 10
   b = 2
   println(a, c, -(a*b+3), ~10, -a*b+3, a & ~b)
 
-  // v = jsonDecode("{\"a\":3, \"v\":{\"key\":true}, \"data\":[true, false, null, 1, \"RXScript\"]}")
-  v = jsonDecode(`{
+  v = jsonDecode("{\"a\":3, \"v\":{\"key\":true}, \"data\":[true, false, null, 1, \"RXScript\"]}")
+  /*v = jsonDecode(`{
       "a": 3,
       "v": { "key": true },
       "data": [true, false, null, 1, "RXScript"]
-    }`)
+    }`)*/
   v["a"] = 38
   println(v, v.a, v["v"]["key"])
   println(v.data[4])

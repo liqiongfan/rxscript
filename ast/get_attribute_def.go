@@ -4,7 +4,10 @@
 
 package ast
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 var _ Node = (*GetAttributeDef)(nil)
 
@@ -33,7 +36,7 @@ func (x *GetAttributeDef) Execute(e RxeHandler) any {
 
 	switch obj := obj.(type) {
 	case *Class:
-		e.SetCallingObject(obj)
+		// e.SetCallingObject(obj)
 
 		// fetch from class object.
 		ret, isPublic, isDynamic := fetchFromClassInstance(e, obj, attrName)
@@ -84,9 +87,14 @@ func (x *GetAttributeDef) Execute(e RxeHandler) any {
 	case *Package:
 		return fetchFromPackage(obj, attrName)
 	case *SystemResource:
+		if obj.obj.Kind() == reflect.Ptr {
+			obj.obj = obj.obj.Elem()
+		}
+
 		m := obj.obj.MethodByName(attrName)
+
 		if m.IsValid() {
-			return &SystemResource{obj: obj.obj.MethodByName(attrName)}
+			return &SystemResource{obj: m}
 		}
 
 		fd := obj.obj.FieldByName(attrName)

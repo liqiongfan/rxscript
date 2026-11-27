@@ -34,11 +34,17 @@ func (p *Write) Execute(rxe RxeHandler) any {
 
 	switch d := dest.(type) {
 	case *OsFile:
-		_, err := d.Value.WriteString(value)
+		n, err := d.Value.WriteString(value)
 		if err != nil {
 			return ThrowSystemError(err)
 		}
-		return &BoolDef{Value: true}
+		return &IntDef{Value: int64(n)}
+	case *HttpResponseWriter:
+		n, err := d.Value.Write([]byte(value))
+		if err != nil {
+			return ThrowSystemError(err)
+		}
+		return &IntDef{Value: int64(n)}
 	default:
 		return ThrowSystemErrorWithFormat("RXScript: write need writeable object to write data.")
 	}

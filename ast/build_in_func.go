@@ -148,6 +148,44 @@ func fetchBuildInFunc(name string) any {
 		return NewJsonEncode()
 	case `generateRSAKey`:
 		return NewGenerateRSAKey()
+	case `runtimeARCH`:
+		return NewRuntimeARCH()
+	case `runtimeOS`:
+		return NewRuntimeOS()
+	case `runtimeVersion`:
+		return NewRuntimeVersion()
+	case `writeHttpResponseCode`:
+		return NewWriteHttpResponseCode()
+	case `newHttpServerMux`:
+		return NewNewHttpServerMux()
+	case `httpServerMuxHandleFunc`:
+		return NewServerMuxHandleFunc()
+	case `httpServerMuxHandler`:
+		return NewServerMuxHandler()
+	case `httpServerListen`:
+		return NewHttpServerListen()
+	case `httpServerListenTLS`:
+		return NewHttpServerTLSListen()
+	case `httpRequestURL`:
+		return NewHttpRequestURL()
+	case `httpRequestPathValue`:
+		return NewHttpRequestPathValue()
+	case `httpRequestHeader`:
+		return NewHttpRequestHeader()
+	case `httpRequestInfo`:
+		return NewHttpRequestInfo()
+	case `httpRequestForm`:
+		return NewHttpRequestForm()
+	case `httpRequestPostForm`:
+		return NewHttpRequestPostForm()
+	case `httpRequestBody`:
+		return NewHttpRequestBody()
+	case `httpFileServer`:
+		return NewHttpFileServer()
+	case `httpStripPrefix`:
+		return NewHttpStripPrefix()
+	case `TG`:
+		return NewTG()
 	default:
 		return nil
 	}

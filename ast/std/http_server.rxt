@@ -1,0 +1,128 @@
+//
+// The RXScript author
+// Http class, encapsulate the HTTP operate.
+//
+
+/**
+ * Wrapper class for an HTTP request, providing convenient access to URL, path parameters, and headers.
+ */
+class HttpRequest {
+  // The underlying native or framework-specific request object
+  private req = null
+
+  /**
+   * Constructs a new HttpRequest instance wrapping the given request object.
+   *
+   * @param request The raw HTTP request object to wrap.
+   */
+  public HttpRequest(request) {
+    this.req = request
+  }
+
+  /**
+   * Retrieves the full request URL.
+   *
+   * @return The URL of the HTTP request.
+   */
+  public requestURL() { return httpRequestURL(this.req) }
+
+  /**
+   * Extracts a path parameter value by its name.
+   *
+   * @param name The name of the path parameter.
+   * @return The value corresponding to the specified path parameter.
+   */
+  public pathValue(name) { return httpRequestPathValue(this.req, name) }
+
+  /**
+   * Retrieves the HTTP headers associated with the request.
+   *
+   * @return The headers of the HTTP request.
+   */
+  public header() { return httpRequestHeader(this.req) }
+
+  /**
+   * Retrieves core metadata about the HTTP request, including host, method, protocol, route pattern, and client address.
+   *
+   * @return A list/tuple of strings containing [Host, Method, Proto, Pattern, RemoteAddr].
+   */
+  public info() { return httpRequestInfo(this.req) }
+
+  /**
+   * Retrieves the parsed form data from the HTTP request (including URL query parameters and POST/PUT form body).
+   *
+   * @return The form data associated with the HTTP request.
+   */
+  public form() { return httpRequestForm(this.req) }
+
+  /**
+   * Retrieves the parsed form data from the HTTP request (including URL query parameters and POST/PUT form body).
+   *
+   * @return The form data associated with the HTTP request.
+   */
+  public postForm() { return httpRequestPostForm(this.req) }
+
+  /**
+   * Retrieves the original data from the HTTP request (including URL query parameters and POST/PUT body).
+   *
+   * @return The original data associated with the HTTP request.
+   */
+  public rawBody() { return httpRequestBody(this.req) }
+}
+
+
+
+/**
+ * HTTP server wrapper class.
+ * Manages the request router (ServeMux) and starts HTTP / HTTPS listeners.
+ */
+class HttpServer {
+
+  /**
+   * Underlying HTTP request multiplexer (ServeMux) instance.
+   */
+  private mux = null
+
+  /**
+   * Initializes a new HttpServer instance with a fresh ServeMux.
+   */
+  public HttpServer() {
+    this.mux = newHttpServerMux()
+  }
+
+  /**
+   * Registers a handler function for the given route pattern.
+   * @param patten  Route pattern (supports HTTP methods and path parameters, e.g., "GET /users/{id}")
+   * @param handler Callback function invoked when the route matches
+   */
+  public handleFunc(patten, handler) {
+    httpServerMuxHandleFunc(this.mux, patten, handler)
+  }
+
+  /**
+   * Registers a handler function for the given route pattern.
+   * @param patten  Route pattern (supports HTTP methods and path parameters, e.g., "GET /users/{id}")
+   * @param handler Callback function invoked when the route matches
+   */
+  public handler(patten, handler) {
+    httpServerMuxHandler(this.mux, patten, handler)
+  }
+
+  /**
+   * Starts the HTTP server and listens for incoming requests (blocking).
+   * @param addr Network address and port to listen on (e.g., ":8080" or "127.0.0.1:8080")
+   */
+  public run(addr) {
+    httpServerListen(addr, this.mux)
+  }
+
+  /**
+   * Starts the HTTPS (TLS) server and listens for incoming requests (blocking).
+   * @param addr Network address and port to listen on (e.g., ":443" or ":8443")
+   * @param cert Path to the SSL/TLS certificate file (e.g., "server.crt")
+   * @param key  Path to the SSL/TLS private key file (e.g., "server.key")
+   */
+  public runWithTLS(addr, cert, key) {
+    httpServerListenTLS(addr, this.mux, cert, key)
+  }
+}

@@ -104,7 +104,7 @@ func (x *ClassBodyDef) Invoke(args []any, e RxeHandler) any {
 			callArgs.Set(arg, args[i].(Node))
 		}
 	}
-
+	
 	e.PushArgStack(callArgs)
 
 	if x.Name == x.ClassName && x.IsMethod {

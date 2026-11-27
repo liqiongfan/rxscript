@@ -223,11 +223,13 @@ func RawAstNode(astNode any, e RxeHandler) any {
 			return v
 		case *ArrayDef, *DictionaryDef:
 			return v
-		case *ChannelDef, *WaitDef, *HttpRequest, *HttpResponseRequest, *OsFile, *Scanner, *TimeTicker, *TimeTimer:
+		case *ChannelDef, *WaitDef, *HttpServerMux, *HttpResponseWriter, *HttpRequest, *HttpResponseRequest, *OsFile, *Scanner, *TimeTicker, *TimeTimer:
 			return v
 		case *ClassBodyDef, *FunctionDef, *SplitArrayDef, *AtomicIntDef:
 			return v
 		case *SystemResource:
+			return v.Execute(e)
+		case *GoResource:
 			return v.Execute(e)
 		case *Class:
 			return v
@@ -268,9 +270,15 @@ func rawValue(qv any, e RxeHandler) any {
 			return v
 		case *SystemResource:
 			return v.obj.Interface()
+		case *GoResource:
+			return v.obj
 		case *HttpRequest:
 			return v.Value
 		case *HttpResponseRequest:
+			return v.Value
+		case *HttpServerMux:
+			return v.Value
+		case *HttpResponseWriter:
 			return v.Value
 		case *OsFile:
 			return v.Value
@@ -391,6 +399,8 @@ func NodeStringValue(astNode any, e RxeHandler) any {
 			return v.String()
 		case *SystemResource:
 			return v.String()
+		case *GoResource:
+			return v.String()
 		case *TimeTicker:
 			return v.String()
 		case *TimeTimer:
@@ -398,6 +408,10 @@ func NodeStringValue(astNode any, e RxeHandler) any {
 		case *HttpRequest:
 			return v.String()
 		case *HttpResponseRequest:
+			return v.String()
+		case *HttpServerMux:
+			return v.String()
+		case *HttpResponseWriter:
 			return v.String()
 		case *OsFile:
 			return v.String()

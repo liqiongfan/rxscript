@@ -46,6 +46,23 @@ rxscript xxx.rxt
 rxscript xxx
 ```
 
+## 实现一个简单的静态文件服务器
+```RXScript
+import std
+
+home(w, r) {
+  write(w, "Welcome to RXScript world")
+}
+
+main() {
+  server = std.HttpServer()
+  server.handleFunc("GET /static/", httpStripPrefix("/static/", httpFileServer(".")))
+  server.handleFunc("GET /{$}", home)
+  server.run(":8081")
+  // if certificates
+  // server.runWithTLS(":8081", "./cert.pem", "./key.pem")
+}
+```
 
 ## 语法指南
 
